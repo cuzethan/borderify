@@ -12,7 +12,8 @@ export default function App(): ReactElement {
 
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-
+  const [dimensions, setDimensions] = useState<{ width: number, height: number } | null>(null)
+  const [aspectRatio, setAspectRatio] = useState<{ width: number, height: number } | null>(null)
   const [isDragging, setIsDragging] = useState<boolean>(false) //hook for visuals
 
   useEffect(() => {
@@ -34,9 +35,33 @@ export default function App(): ReactElement {
   const acceptFirstImage = (maybeFiles: FileList | null | undefined): void => {
     const first = maybeFiles?.[0]
     if (!first) return
-    console.log(first)
     if (!first.type?.startsWith('image/')) return
     setSelectedFile(first)
+    getDimensions(first)
+  }
+
+  const getDimensions = (file: File): void => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.src = objectUrl;
+    img.onload = () => {
+      setDimensions({ width: img.width, height: img.height });
+      calculateAspectRatio(img.width, img.height);
+      URL.revokeObjectURL(objectUrl);
+    };
+    img.onerror = () => {
+      setDimensions(null);
+      setAspectRatio(null);
+      URL.revokeObjectURL(objectUrl);
+    };
+  };
+
+  const calculateAspectRatio = (width: number, height: number): void => {
+    const greatestCommonDivisor = (a: number, b: number): number => {
+      return b === 0 ? a : greatestCommonDivisor(b, a % b);
+    }
+    const divisor = greatestCommonDivisor(width, height);
+    setAspectRatio({ width: width / divisor, height: height / divisor })
   }
 
   return (
@@ -114,8 +139,19 @@ export default function App(): ReactElement {
         </div>
 
         {previewUrl ? (
-          <div className="mt-6">
-            <div className="text-sm font-medium text-gray-900 mb-2">Preview</div>
+          <div className="mt-6 text-sm text-gray-900 mb-2 font-bold">
+            <div className="flex flex-row justify-between items-center">
+              <div>Preview</div>
+              {dimensions && aspectRatio ? (
+                <div>
+                  <p>
+                    Dimensions: {dimensions.width}x{dimensions.height}
+                  </p>
+                  <p>
+                    Aspect Ratio: {aspectRatio.width}:{aspectRatio.height}</p>
+                </div>
+              ) : null}
+            </div>
             <div className="rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">
               <img
                 alt={file?.name || 'Uploaded preview'}
