@@ -1,10 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type DragEvent,
+  type ReactElement,
+} from 'react'
 
-function App() {
-  const fileInputRef = useRef(null)
-  const [file, setFile] = useState(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState(null)
+export default function App(): ReactElement {
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  const [file, setFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
+  const [isDragging, setIsDragging] = useState<boolean>(false) //hook for visuals
 
   useEffect(() => {
     return () => {
@@ -12,19 +21,20 @@ function App() {
     }
   }, [previewUrl])
 
-  const pickFile = () => fileInputRef.current?.click()
+  const pickFile = (): void => fileInputRef.current?.click()
 
-  const setSelectedFile = (nextFile) => {
-    setFile(nextFile || null)
+  const setSelectedFile = (nextFile: File | null): void => {
+    setFile(nextFile)
     setPreviewUrl((prev) => {
       if (prev) URL.revokeObjectURL(prev)
       return nextFile ? URL.createObjectURL(nextFile) : null
     })
   }
 
-  const acceptFirstImage = (maybeFiles) => {
+  const acceptFirstImage = (maybeFiles: FileList | null | undefined): void => {
     const first = maybeFiles?.[0]
     if (!first) return
+    console.log(first)
     if (!first.type?.startsWith('image/')) return
     setSelectedFile(first)
   }
@@ -48,22 +58,22 @@ function App() {
               ? 'border-indigo-500 bg-indigo-50'
               : 'border-gray-300 hover:border-gray-400',
           ].join(' ')}
-          onDragEnter={(e) => {
+          onDragEnter={(e: DragEvent<HTMLDivElement>) => {
             e.preventDefault()
             e.stopPropagation()
             setIsDragging(true)
           }}
-          onDragOver={(e) => {
+          onDragOver={(e: DragEvent<HTMLDivElement>) => {
             e.preventDefault()
             e.stopPropagation()
             setIsDragging(true)
           }}
-          onDragLeave={(e) => {
+          onDragLeave={(e: DragEvent<HTMLDivElement>) => {
             e.preventDefault()
             e.stopPropagation()
             setIsDragging(false)
           }}
-          onDrop={(e) => {
+          onDrop={(e: DragEvent<HTMLDivElement>) => {
             e.preventDefault()
             e.stopPropagation()
             setIsDragging(false)
@@ -75,7 +85,7 @@ function App() {
             className="hidden"
             type="file"
             accept="image/*"
-            onChange={(e) => {
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
               acceptFirstImage(e.target.files)
               e.target.value = ''
             }}
@@ -94,9 +104,7 @@ function App() {
             >
               Upload image
             </button>
-            <p className="text-sm text-gray-600">
-              or drag and drop an image here
-            </p>
+            <p className="text-sm text-gray-600">or drag and drop an image here</p>
             {file ? (
               <p className="text-xs text-gray-500">
                 Selected: <span className="font-medium text-gray-700">{file.name}</span>
@@ -118,11 +126,10 @@ function App() {
           </div>
         ) : null}
       </main>
+
       <footer className="border-t border-gray-200 bg-white px-4 py-2 text-sm text-gray-500">
-        Footer
       </footer>
     </div>
   )
 }
 
-export default App
