@@ -3,7 +3,7 @@ import type { PhotoConfig } from '../types';
 import { useStore } from '../store';
 import { renderPhotoToCanvas } from '../lib/render';
 import { CANVAS_PRESETS } from '../lib/presets';
-import { computeDestRect, isCentered, snapToCenter, SNAP_THRESHOLD } from '../lib/geometry';
+import { clampTransform, computeDestRect, isCentered, snapToCenter, SNAP_THRESHOLD } from '../lib/geometry';
 
 type HandleId = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w';
 
@@ -83,8 +83,9 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
     const rawY = drag.baseY + dy;
     const snappedX = snapToCenter(rawX);
     const snappedY = snapToCenter(rawY);
-    setSnapping(snappedX === 0 || snappedY === 0);
-    updateTransform(photo.id, { offsetX: snappedX, offsetY: snappedY });
+    const clamped = clampTransform(photo, snappedX, snappedY, photo.scale);
+    setSnapping(clamped.offsetX === 0 || clamped.offsetY === 0);
+    updateTransform(photo.id, { offsetX: clamped.offsetX, offsetY: clamped.offsetY });
   }
 
   function onPointerUp(e: PointerEvent<HTMLCanvasElement>) {
@@ -96,8 +97,8 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
   function onWheel(e: WheelEvent<HTMLCanvasElement>) {
     e.preventDefault();
     const factor = e.deltaY < 0 ? 1.05 : 0.95;
-    const next = Math.max(0.1, Math.min(5, photo.scale * factor));
-    updateTransform(photo.id, { scale: next });
+    const { scale, offsetX, offsetY } = clampTransform(photo, photo.offsetX, photo.offsetY, photo.scale * factor);
+    updateTransform(photo.id, { scale, offsetX, offsetY });
   }
 
   // Aspect-locked resize via handles ------------------------------------
@@ -139,8 +140,8 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
       const nowD = Math.hypot(nowDx, nowDy);
       factor = startD > 1 ? nowD / startD : 1;
     }
-    const next = Math.max(0.1, Math.min(5, r.startScale * factor));
-    updateTransform(photo.id, { scale: next });
+    const { scale, offsetX, offsetY } = clampTransform(photo, photo.offsetX, photo.offsetY, r.startScale * factor);
+    updateTransform(photo.id, { scale, offsetX, offsetY });
   }
 
   function onHandleUp(e: PointerEvent<HTMLDivElement>) {
