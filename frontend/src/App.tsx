@@ -4,6 +4,7 @@ import { UploadScreen } from './components/UploadScreen';
 import { EditorScreen } from './components/EditorScreen';
 import { LoginPage } from './pages/LoginPage';
 import { LandingPage } from './pages/LandingPage';
+import { SignupPage } from './pages/SignupPage';
 
 function Editor() {
   const photos = useStore((s) => s.photos);
@@ -21,6 +22,7 @@ export function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/app" element={<Editor />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Routes>
     </BrowserRouter>
   );
