@@ -5,6 +5,7 @@ import { initialPhotoConfig, makeSplitPair } from './lib/autoLayout';
 interface Store {
   photos: PhotoConfig[];
   selectedId: string | null;
+  gridlinesHidden: boolean;
 
   addFiles: (files: File[]) => Promise<void>;
   removePhoto: (id: string) => void;
@@ -16,12 +17,14 @@ interface Store {
   updateBorder: (id: string, patch: Partial<BorderConfig>) => void;
   updateTransform: (id: string, patch: { offsetX?: number; offsetY?: number; scale?: number }) => void;
   splitPhoto: (id: string) => void;
+  toggleGridlines: () => void;
   clearAll: () => void;
 }
 
 export const useStore = create<Store>((set, get) => ({
   photos: [],
   selectedId: null,
+  gridlinesHidden: false,
 
   addFiles: async (files) => {
     const configs = await Promise.all(files.map((f) => initialPhotoConfig(f)));
@@ -83,6 +86,8 @@ export const useStore = create<Store>((set, get) => ({
       return { photos, selectedId: pair[0].id };
     });
   },
+
+  toggleGridlines: () => set((s) => ({ gridlinesHidden: !s.gridlinesHidden })),
 
   clearAll: () => set({ photos: [], selectedId: null }),
 }));

@@ -2,6 +2,7 @@ import type { PhotoConfig, BorderType, CanvasPreset } from '../types';
 import { useStore } from '../store';
 import { CANVAS_PRESETS, PRESET_ORDER } from '../lib/presets';
 import { splitDirectionFor } from '../lib/autoLayout';
+import { isCentered } from '../lib/geometry';
 import { BorderControls } from './BorderControls';
 
 const BORDER_TYPES: { id: BorderType; label: string }[] = [
@@ -17,6 +18,8 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
   const updateBorder = useStore((s) => s.updateBorder);
   const splitPhoto = useStore((s) => s.splitPhoto);
   const photoCount = useStore((s) => s.photos.length);
+  const gridlinesHidden = useStore((s) => s.gridlinesHidden);
+  const toggleGridlines = useStore((s) => s.toggleGridlines);
 
   if (!photo) {
     return (
@@ -70,6 +73,17 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
       <Section title="Border options">
         <BorderControls photo={photo} />
       </Section>
+
+      {isCentered(photo.offsetX, photo.offsetY) ? (
+        <Section title="Center guides">
+          <button
+            onClick={toggleGridlines}
+            className="w-full rounded-md border border-neutral-700 px-2 py-1.5 text-xs hover:bg-neutral-800"
+          >
+            {gridlinesHidden ? 'Show center gridlines' : 'Hide center gridlines'}
+          </button>
+        </Section>
+      ) : null}
 
       {canSplit ? (
         <Section title="Carousel split">

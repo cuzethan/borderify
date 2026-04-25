@@ -20,6 +20,7 @@ const HANDLES: { id: HandleId; cursor: string; xFrac: number; yFrac: number }[] 
 
 export function CanvasStage({ photo }: { photo: PhotoConfig }) {
   const updateTransform = useStore((s) => s.updateTransform);
+  const gridlinesHidden = useStore((s) => s.gridlinesHidden);
   const ref = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [snapping, setSnapping] = useState(false);
@@ -154,7 +155,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
   const handleW = dest.dw * displayScale;
   const handleH = dest.dh * displayScale;
 
-  const showGuides = snapping || isCentered(photo.offsetX, photo.offsetY);
+  const showGuides = snapping || (isCentered(photo.offsetX, photo.offsetY) && !gridlinesHidden);
 
   return (
     <div ref={containerRef} className="relative flex h-full w-full items-center justify-center overflow-hidden">
