@@ -42,7 +42,7 @@ export function PhotoList() {
                 e.stopPropagation();
                 removePhoto(photo.id);
               }}
-              className="rounded p-0.5 text-neutral-500 opacity-0 hover:bg-red-500/20 hover:text-red-300 group-hover:opacity-100"
+              className="rounded-full w-6 h-6 text-sm text-neutral-500 opacity-0 hover:bg-red-500/20 hover:text-red-300 group-hover:opacity-100 flex items-center justify-center"
               title="Remove"
             >
               ×
