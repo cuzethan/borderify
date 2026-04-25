@@ -1,6 +1,6 @@
-node_modules
-dist
-dist-ssr
+node_modules/
+dist/
+dist-ssr/
 *.local
 .DS_Store
 .vscode/*
@@ -8,3 +8,5 @@ dist-ssr
 .idea
 *.log
 tsconfig.tsbuildinfo
+.env
+.env.local
