@@ -61,8 +61,12 @@ export function computeDestRect(config: PhotoConfig): DestRect {
   };
 }
 
-export const SNAP_THRESHOLD = 12;
+export const SNAP_THRESHOLD = 60;
 
 export function snapToCenter(value: number): number {
   return Math.abs(value) < SNAP_THRESHOLD ? 0 : value;
+}
+
+export function isCentered(offsetX: number, offsetY: number): boolean {
+  return offsetX === 0 && offsetY === 0;
 }

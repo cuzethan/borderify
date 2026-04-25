@@ -12,9 +12,9 @@ interface Store {
   reorder: (fromIndex: number, toIndex: number) => void;
 
   updatePreset: (id: string, preset: CanvasPreset) => void;
+  applyPresetToAll: (preset: CanvasPreset) => void;
   updateBorder: (id: string, patch: Partial<BorderConfig>) => void;
   updateTransform: (id: string, patch: { offsetX?: number; offsetY?: number; scale?: number }) => void;
-  resetTransform: (id: string) => void;
   splitPhoto: (id: string) => void;
   clearAll: () => void;
 }
@@ -55,6 +55,11 @@ export const useStore = create<Store>((set, get) => ({
       ),
     })),
 
+  applyPresetToAll: (preset) =>
+    set((s) => ({
+      photos: s.photos.map((p) => ({ ...p, preset, offsetX: 0, offsetY: 0, scale: 1 })),
+    })),
+
   updateBorder: (id, patch) =>
     set((s) => ({
       photos: s.photos.map((p) => (p.id === id ? { ...p, border: { ...p.border, ...patch } } : p)),
@@ -63,11 +68,6 @@ export const useStore = create<Store>((set, get) => ({
   updateTransform: (id, patch) =>
     set((s) => ({
       photos: s.photos.map((p) => (p.id === id ? { ...p, ...patch } : p)),
-    })),
-
-  resetTransform: (id) =>
-    set((s) => ({
-      photos: s.photos.map((p) => (p.id === id ? { ...p, offsetX: 0, offsetY: 0, scale: 1 } : p)),
     })),
 
   splitPhoto: (id) => {

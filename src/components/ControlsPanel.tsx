@@ -13,9 +13,10 @@ const BORDER_TYPES: { id: BorderType; label: string }[] = [
 
 export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
   const updatePreset = useStore((s) => s.updatePreset);
+  const applyPresetToAll = useStore((s) => s.applyPresetToAll);
   const updateBorder = useStore((s) => s.updateBorder);
-  const resetTransform = useStore((s) => s.resetTransform);
   const splitPhoto = useStore((s) => s.splitPhoto);
+  const photoCount = useStore((s) => s.photos.length);
 
   if (!photo) {
     return (
@@ -36,6 +37,15 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
             <PresetButton key={p} preset={p} active={photo.preset === p} onClick={() => updatePreset(photo.id, p)} />
           ))}
         </div>
+        {photoCount > 1 ? (
+          <button
+            onClick={() => applyPresetToAll(photo.preset)}
+            className="mt-2 w-full rounded-md border border-neutral-700 px-2 py-1.5 text-xs text-neutral-300 hover:bg-neutral-800"
+            title="Set every photo to this canvas size"
+          >
+            Apply {CANVAS_PRESETS[photo.preset].label} to all {photoCount} photos
+          </button>
+        ) : null}
       </Section>
 
       <Section title="Border type">
@@ -59,15 +69,6 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
 
       <Section title="Border options">
         <BorderControls photo={photo} />
-      </Section>
-
-      <Section title="Position">
-        <button
-          onClick={() => resetTransform(photo.id)}
-          className="w-full rounded-md border border-neutral-700 px-2 py-1.5 text-xs hover:bg-neutral-800"
-        >
-          Reset to fit-center
-        </button>
       </Section>
 
       {canSplit ? (
