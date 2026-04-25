@@ -70,3 +70,33 @@ export function snapToCenter(value: number): number {
 export function isCentered(offsetX: number, offsetY: number): boolean {
   return offsetX === 0 && offsetY === 0;
 }
+
+/**
+ * Clamp scale and offset so the image always stays fully within the canvas.
+ * Max scale is determined by whichever canvas dimension the image fills first;
+ * max offset shrinks as the image grows (less room to move when it's bigger).
+ */
+export function clampTransform(
+  photo: PhotoConfig,
+  offsetX: number,
+  offsetY: number,
+  scale: number,
+): { offsetX: number; offsetY: number; scale: number } {
+  const { w: cw, h: ch } = CANVAS_PRESETS[photo.preset];
+  const src = effectiveSource(photo);
+  const fit = fitContain(src.sw, src.sh, cw, ch);
+
+  const maxScale = Math.min(cw / fit.dw, ch / fit.dh);
+  const clampedScale = Math.max(0.05, Math.min(maxScale, scale));
+
+  const dw = fit.dw * clampedScale;
+  const dh = fit.dh * clampedScale;
+  const maxOffsetX = (cw - dw) / 2;
+  const maxOffsetY = (ch - dh) / 2;
+
+  return {
+    scale: clampedScale,
+    offsetX: Math.max(-maxOffsetX, Math.min(maxOffsetX, offsetX)),
+    offsetY: Math.max(-maxOffsetY, Math.min(maxOffsetY, offsetY)),
+  };
+}
