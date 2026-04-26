@@ -31,7 +31,7 @@ export function SignupPage() {
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-2">
             <img src="/logo.png" alt="Borderify logo" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-            <h1 className="text-3xl font-bold tracking-tight">Borderify</h1>
+            <h1 className="font-brand text-4xl tracking-tight">Borderify</h1>
           </div>
           <p className="mt-2 text-sm text-neutral-400">Create your account</p>
         </div>

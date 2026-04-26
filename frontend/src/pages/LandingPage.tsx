@@ -35,12 +35,12 @@ export function LandingPage(): JSX.Element {
         rel="stylesheet"
       />
 
-      <div style={{ background: "#111111", color: "#e8e8e8" }}>
+      <div className="landing" style={{ background: "#111111", color: "#e8e8e8" }}>
         <div className="page-content">
         <nav>
           <div style={{ display: 'flex', alignItems: 'center' }}>
                 <img src="/logo.png" alt="Borderify logo" className="logo-img" style={{ marginRight: 10, width: 36, height: 36 }} />
-                <span style={{ fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1 }}>
+                <span style={{ fontFamily: "'Lora', serif", fontWeight: 500, fontSize: '1.4rem', lineHeight: 1 }}>
                   Borderify
                 </span>
               </div>
