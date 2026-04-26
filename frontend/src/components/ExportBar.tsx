@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
 interface PreparedUpload {
   blob: Blob;
@@ -92,7 +92,7 @@ async function uploadPreparedImageViaBackend(
   formData.append('file', prepared.blob, prepared.fileName);
   formData.append('public_id', publicId);
 
-  const response = await fetch(`${apiBaseUrl}/api/photos/upload`, {
+  const response = await fetch(`${apiBaseUrl}/photos/upload`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -115,7 +115,7 @@ async function resetUserFolderViaBackend(): Promise<void> {
   const token = session?.access_token;
   if (!token) throw new Error('Missing auth session');
 
-  const response = await fetch(`${apiBaseUrl}/api/photos/reset-folder`, {
+  const response = await fetch(`${apiBaseUrl}/photos/reset-folder`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -135,7 +135,7 @@ async function saveSessionViaBackend(payload: unknown): Promise<void> {
   const token = session?.access_token;
   if (!token) throw new Error('Missing auth session');
 
-  const response = await fetch(`${apiBaseUrl}/api/photos/sessions`, {
+  const response = await fetch(`${apiBaseUrl}/photos/sessions`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,

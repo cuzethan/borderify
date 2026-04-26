@@ -7,7 +7,7 @@ import { useStore, type SavedPhoto } from '../store';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? '/api';
 
 export function AppPage() {
   const photos = useStore((s) => s.photos);
@@ -28,7 +28,7 @@ export function AppPage() {
         const token = session?.access_token;
         if (!token) return;
 
-        const response = await fetch(`${apiBaseUrl}/api/photos/sessions/latest`, {
+        const response = await fetch(`${apiBaseUrl}/photos/sessions/latest`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!response.ok) {
