@@ -194,7 +194,8 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
   const visibleW = dest.dw * cropForFrame.w * displayScale;
   const visibleH = dest.dh * cropForFrame.h * displayScale;
 
-  const showGuides = snapping || (isVisiblyCentered(photo) && !gridlinesHidden);
+  const showSnapGuides = snapping && isVisiblyCentered(photo);
+  const showGrid = !gridlinesHidden;
   const baseDest = computeBaseDestRect(photo);
   const crop = cropForFrame;
   const cropLeft = (baseDest.dx + baseDest.dw * crop.x) * displayScale;
@@ -399,13 +400,24 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
           </>
         )}
 
-        {/* Center gridlines: shown while snapping during drag, OR persistently when centered */}
-        {showGuides ? (
+        {/* 4×4 grid: always shown when gridlines are enabled */}
+        {showGrid && (
+          <div className="pointer-events-none absolute inset-0">
+            {[25, 50, 75].map((pct) => (
+              <div key={`v${pct}`} className="absolute top-0 h-full w-[1.5px] bg-black/40" style={{ left: `${pct}%` }} />
+            ))}
+            {[25, 50, 75].map((pct) => (
+              <div key={`h${pct}`} className="absolute left-0 h-[1.5px] w-full bg-black/40" style={{ top: `${pct}%` }} />
+            ))}
+          </div>
+        )}
+        {/* Center snap guides: shown only while dragging and snapping to center */}
+        {showSnapGuides && (
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-emerald-400/70" />
             <div className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-emerald-400/70" />
           </div>
-        ) : null}
+        )}
       </div>
 
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded bg-black/60 px-2 py-1 text-xs text-neutral-300">
