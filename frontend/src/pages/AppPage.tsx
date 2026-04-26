@@ -13,8 +13,10 @@ export function AppPage() {
   const photos = useStore((s) => s.photos);
   const loadSavedSession = useStore((s) => s.loadSavedSession);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [hasCheckedSession, setHasCheckedSession] = useState(false);
 
   useEffect(() => {
+    if (hasCheckedSession) return;
     let cancelled = false;
 
     async function maybeLoadSession() {
@@ -43,7 +45,10 @@ export function AppPage() {
       } catch (error) {
         console.error('Failed to restore saved session', error);
       } finally {
-        if (!cancelled) setCheckingSession(false);
+        if (!cancelled) {
+          setCheckingSession(false);
+          setHasCheckedSession(true);
+        }
       }
     }
 
@@ -51,7 +56,7 @@ export function AppPage() {
     return () => {
       cancelled = true;
     };
-  }, [photos.length, loadSavedSession]);
+  }, [hasCheckedSession, photos.length, loadSavedSession]);
 
   if (checkingSession) {
     return (
