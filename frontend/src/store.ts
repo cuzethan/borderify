@@ -54,7 +54,7 @@ export const useStore = create<Store>((set, get) => ({
   user: null,
   photos: [],
   selectedId: null,
-  gridlinesHidden: false,
+  gridlinesHidden: true,
   editorMode: 'move',
   symmetricCrop: false,
 

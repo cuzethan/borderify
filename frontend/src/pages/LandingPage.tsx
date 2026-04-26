@@ -360,9 +360,9 @@ export function LandingPage(): JSX.Element {
 
         footer {
           padding: 2.5rem;
-          display: flex;
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
           align-items: center;
-          justify-content: space-between;
           border-top: 1px solid #222222;
         }
 
@@ -392,7 +392,6 @@ export function LandingPage(): JSX.Element {
         }
 
         .footer-center {
-          flex: 1;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -422,9 +421,26 @@ export function LandingPage(): JSX.Element {
           font-weight: 600;
         }
 
-        .github-btn:hover { opacity: 0.98; transform: translateY(-1px); background: rgba(255,255,255,0.02); }
+        .github-btn:hover { background: #e8e8e8; color: #111111; border-color: #e8e8e8; }
 
         .github-btn svg { width: 22px; height: 22px; fill: currentColor; }
+
+        .sjhacks-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.25rem 0.8rem 0.25rem 0.6rem;
+          border-radius: 6px;
+          border: 1px solid transparent;
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #ffffff;
+          letter-spacing: 0.02em;
+          transition: background 0.15s, border-color 0.15s, color 0.15s;
+          justify-self: start;
+        }
+
+        .sjhacks-btn:hover { background: #e8e8e8; border-color: #e8e8e8; color: #111111; }
 
         .sides-wrapper {
           position: relative;
@@ -647,16 +663,21 @@ export function LandingPage(): JSX.Element {
         </div>{/* sides-wrapper */}
 
         <footer>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <a
+            href="https://sjhacks-2026.devpost.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sjhacks-btn"
+          >
             <img src="/sjhacks.svg" alt="SJHacks" style={{ width: 40, height: 40 }} />
-            <span style={{ fontSize: '1.2rem', fontWeight: 600, color: '#ffffff', letterSpacing: '0.02em' }}>SJHacks 2026</span>
-          </div>
+            <span>SJHacks 2026</span>
+          </a>
 
           <div className="footer-center">
             <span className="footer-copy">Brendan Ly · Ethan Le · Jason Nguyen</span>
           </div>
 
-          <div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <a href="https://github.com/cuzethan/sjhacks" className="github-btn" aria-label="View on GitHub">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.729.083-.729 1.205.085 1.84 1.237 1.84 1.237 1.07 1.835 2.807 1.305 3.492.998.108-.776.418-1.305.762-1.605-2.665-.3-5.467-1.332-5.467-5.93 0-1.31.47-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.77.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.898-.015 3.293 0 .315.21.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
