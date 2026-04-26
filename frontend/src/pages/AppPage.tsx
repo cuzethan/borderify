@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { EditorScreen } from '../components/EditorScreen';
-import { UploadScreen } from '../components/UploadScreen';
 import { useStore, type SavedPhoto } from '../store';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -66,5 +65,5 @@ export function AppPage() {
     );
   }
 
-  return <div className="h-full w-full">{photos.length === 0 ? <UploadScreen /> : <EditorScreen />}</div>;
+  return <div className="h-full w-full"><EditorScreen /></div>;
 }

@@ -26,6 +26,7 @@ interface Store {
   selectedId: string | null;
   gridlinesHidden: boolean;
   editorMode: EditorMode;
+  symmetricCrop: boolean;
 
   login: (email: string) => void;
   logout: () => void;
@@ -44,6 +45,7 @@ interface Store {
   splitPhoto: (id: string) => void;
   setEditorMode: (mode: EditorMode) => void;
   toggleGridlines: () => void;
+  toggleSymmetricCrop: () => void;
   clearAll: () => void;
   loadSavedSession: (savedPhotos: SavedPhoto[]) => Promise<void>;
 }
@@ -54,6 +56,7 @@ export const useStore = create<Store>((set, get) => ({
   selectedId: null,
   gridlinesHidden: false,
   editorMode: 'move',
+  symmetricCrop: false,
 
   login: (email) => set({ user: { email } }),
   logout: () => set({ user: null }),
@@ -224,6 +227,7 @@ export const useStore = create<Store>((set, get) => ({
   setEditorMode: (mode) => set({ editorMode: mode }),
 
   toggleGridlines: () => set((s) => ({ gridlinesHidden: !s.gridlinesHidden })),
+  toggleSymmetricCrop: () => set((s) => ({ symmetricCrop: !s.symmetricCrop })),
 
   clearAll: () => set({ photos: [], selectedId: null }),
 

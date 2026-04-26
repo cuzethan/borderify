@@ -7,6 +7,7 @@ export function LandingPage(): JSX.Element {
   const rightRef = useRef<HTMLImageElement>(null);
   const user = useStore((s) => s.user);
   const logout = () => supabase.auth.signOut();
+  const appHref = user ? '/app' : '/upload';
 
   useEffect(() => {
     let rafId: number;
@@ -531,7 +532,7 @@ export function LandingPage(): JSX.Element {
           </p>
           <div className="hero-actions">
             <a
-              href="/app"
+              href={appHref}
               className="btn-lg"
               style={{ backgroundColor: "#10B981", color: "black", fontWeight: 600 }}
             >

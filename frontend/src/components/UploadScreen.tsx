@@ -18,6 +18,7 @@ export function UploadScreen() {
     setBusy(true);
     try {
       await addFiles(files);
+      navigate('/app');
     } finally {
       setBusy(false);
     }

@@ -22,6 +22,8 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
   const photoCount = useStore((s) => s.photos.length);
   const gridlinesHidden = useStore((s) => s.gridlinesHidden);
   const toggleGridlines = useStore((s) => s.toggleGridlines);
+  const symmetricCrop = useStore((s) => s.symmetricCrop);
+  const toggleSymmetricCrop = useStore((s) => s.toggleSymmetricCrop);
 
   if (!photo) {
     return (
@@ -107,6 +109,26 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
         >
           Reset crop
         </button>
+        {editorMode === 'crop' && (
+          <label className="mt-2 flex cursor-pointer items-center gap-2 text-xs text-neutral-300">
+            <div className="relative flex items-center justify-center">
+              <input
+                type="checkbox"
+                checked={symmetricCrop}
+                onChange={toggleSymmetricCrop}
+                className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded-sm border border-neutral-600 bg-neutral-800 checked:border-emerald-500 checked:bg-emerald-500"
+              />
+              <svg
+                className="pointer-events-none absolute hidden h-3.5 w-3.5 text-black peer-checked:block"
+                viewBox="0 0 14 14"
+                fill="none"
+              >
+                <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            Symmetric crop
+          </label>
+        )}
       </Section>
 
       {isCentered(photo.offsetX, photo.offsetY) ? (

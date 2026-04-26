@@ -5,6 +5,7 @@ import { LoginPage } from './pages/LoginPage';
 import { LandingPage } from './pages/LandingPage';
 import { SignupPage } from './pages/SignupPage';
 import { AppPage } from './pages/AppPage';
+import { UploadScreen } from './components/UploadScreen';
 import { supabase } from './lib/supabase';
 import { useStore } from './store';
 
@@ -32,6 +33,7 @@ export function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/upload" element={<UploadScreen />} />
         <Route path="/app" element={<AppPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />

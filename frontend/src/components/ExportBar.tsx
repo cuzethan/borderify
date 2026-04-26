@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { exportAll, triggerDownload } from '../lib/export';
@@ -152,9 +152,7 @@ async function saveSessionViaBackend(payload: unknown): Promise<void> {
 
 export function ExportBar() {
   const photos = useStore((s) => s.photos);
-  const addFiles = useStore((s) => s.addFiles);
   const clearAll = useStore((s) => s.clearAll);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
@@ -246,13 +244,6 @@ export function ExportBar() {
     }
   }
 
-  async function onAdd(e: ChangeEvent<HTMLInputElement>) {
-    const list = e.target.files;
-    if (!list) return;
-    await addFiles(Array.from(list).filter((f) => f.type.startsWith('image/')));
-    e.target.value = '';
-  }
-
   async function onLogout() {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -278,13 +269,6 @@ export function ExportBar() {
         </div>
 
       <div className="flex items-center gap-2">
-        <button
-          onClick={() => inputRef.current?.click()}
-          className="rounded-md border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
-        >
-          + Add photos
-        </button>
-
         <button
           onClick={() => {
             if (confirm('Clear all photos?')) clearAll();
@@ -321,14 +305,6 @@ export function ExportBar() {
           </button>
         )}
 
-        <input
-          ref={inputRef}
-          type="file"
-          multiple
-          accept="image/png,image/jpeg"
-          className="hidden"
-          onChange={onAdd}
-        />
       </div>
     </header>
   );

@@ -31,9 +31,11 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
   const updateCrop = useStore((s) => s.updateCrop);
   const editorMode = useStore((s) => s.editorMode);
   const gridlinesHidden = useStore((s) => s.gridlinesHidden);
+  const symmetricCrop = useStore((s) => s.symmetricCrop);
   const ref = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [snapping, setSnapping] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const dragRef = useRef<{ startX: number; startY: number; baseX: number; baseY: number } | null>(null);
   const resizeRef = useRef<{
     handle: HandleId;
@@ -258,20 +260,40 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
     const right = x + w;
     const bottom = y + h;
     if (state.handle.includes('w')) {
-      const nextX = Math.min(right - minPx, x + dx);
-      x = nextX;
-      w = right - nextX;
+      if (symmetricCrop) {
+        x = x + dx;
+        w = w - 2 * dx;
+      } else {
+        const nextX = Math.min(right - minPx, x + dx);
+        x = nextX;
+        w = right - nextX;
+      }
     }
     if (state.handle.includes('e')) {
-      w = Math.max(minPx, w + dx);
+      if (symmetricCrop) {
+        x = x - dx;
+        w = w + 2 * dx;
+      } else {
+        w = Math.max(minPx, w + dx);
+      }
     }
     if (state.handle.includes('n')) {
-      const nextY = Math.min(bottom - minPx, y + dy);
-      y = nextY;
-      h = bottom - nextY;
+      if (symmetricCrop) {
+        y = y + dy;
+        h = h - 2 * dy;
+      } else {
+        const nextY = Math.min(bottom - minPx, y + dy);
+        y = nextY;
+        h = bottom - nextY;
+      }
     }
     if (state.handle.includes('s')) {
-      h = Math.max(minPx, h + dy);
+      if (symmetricCrop) {
+        y = y - dy;
+        h = h + 2 * dy;
+      } else {
+        h = Math.max(minPx, h + dy);
+      }
     }
     const bx = state.baseRect.x;
     const by = state.baseRect.y;
@@ -300,6 +322,8 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
       <div
         className="relative shadow-2xl"
         style={{ width: cw * displayScale, height: ch * displayScale }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
         <canvas
           ref={ref}
@@ -311,7 +335,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
           className={['block', editorMode === 'move' ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'].join(' ')}
         />
 
-        {editorMode === 'move' ? (
+        {editorMode === 'move' && hovered ? (
           <>
             <div
               className="pointer-events-none absolute border border-emerald-400/60"
@@ -343,7 +367,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
               onPointerDown={onCropMoveDown}
               onPointerMove={onCropMove}
               onPointerUp={onCropMoveUp}
-              className="absolute border border-sky-400/90 bg-sky-500/10"
+              className={`absolute ${hovered ? 'border border-sky-400/90 bg-sky-500/10' : 'border-0'}`}
               style={{
                 left: cropLeft,
                 top: cropTop,
@@ -353,7 +377,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
                 touchAction: 'none',
               }}
             />
-            {HANDLES.map((h) => {
+            {hovered && HANDLES.map((h) => {
               const x = cropLeft + cropW * h.xFrac;
               const y = cropTop + cropH * h.yFrac;
               return (
