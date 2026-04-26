@@ -20,7 +20,7 @@ photos_router = APIRouter(prefix="/api/photos", tags=["photos"])
 logger = logging.getLogger(__name__)
 
 
-@photos_router.post("/sessions", status_code=status.HTTP_201_CREATED)
+@photos_router.post("/sessions", status_code=status.HTTP_200_OK)
 async def create_session(
     current_user: CurrentUser,
     payload: dict[str, Any] | None = None,
@@ -39,12 +39,12 @@ async def create_session(
         "user_id": current_user.user_id,
         "photos": photos_payload,
     }
-    rest_url = f"{settings.supabase_url.rstrip('/')}/rest/v1/session"
+    rest_url = f"{settings.supabase_url.rstrip('/')}/rest/v1/session?on_conflict=user_id"
     headers = {
         "apikey": settings.supabase_service_role_key,
         "Authorization": f"Bearer {settings.supabase_service_role_key}",
         "Content-Type": "application/json",
-        "Prefer": "return=representation",
+        "Prefer": "resolution=merge-duplicates,return=representation",
     }
 
     try:
@@ -53,13 +53,13 @@ async def create_session(
             if response.status_code >= 400:
                 raise HTTPException(
                     status_code=status.HTTP_502_BAD_GATEWAY,
-                    detail=f"Supabase insert failed: {response.text}",
+                    detail=f"Supabase upsert failed: {response.text}",
                 )
             inserted = response.json()
     except httpx.HTTPError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"Supabase insert failed: {exc}",
+            detail=f"Supabase upsert failed: {exc}",
         ) from exc
 
     inserted_row = inserted[0] if isinstance(inserted, list) and inserted else None
@@ -76,7 +76,7 @@ async def get_latest_session(current_user: CurrentUser) -> dict[str, Any]:
 
     rest_url = (
         f"{settings.supabase_url.rstrip('/')}/rest/v1/session"
-        f"?user_id=eq.{current_user.user_id}&select=id,created_at,photos&order=created_at.desc&limit=1"
+        f"?user_id=eq.{current_user.user_id}&select=user_id,created_at,photos&order=created_at.desc&limit=1"
     )
     headers = {
         "apikey": settings.supabase_service_role_key,
