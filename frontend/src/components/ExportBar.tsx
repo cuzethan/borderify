@@ -1,6 +1,12 @@
-import { useRef, useState, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { exportAll, triggerDownload } from '../lib/export';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export function ExportBar() {
   const photos = useStore((s) => s.photos);
@@ -8,6 +14,28 @@ export function ExportBar() {
   const clearAll = useStore((s) => s.clearAll);
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      setIsLoggedIn(Boolean(data.session?.user));
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   async function onExport() {
     setBusy(true);
@@ -24,6 +52,15 @@ export function ExportBar() {
     if (!list) return;
     await addFiles(Array.from(list).filter((f) => f.type.startsWith('image/')));
     e.target.value = '';
+  }
+
+  async function onLogout() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error(error);
+      return;
+    }
+    navigate('/login');
   }
 
   return (
@@ -49,6 +86,14 @@ export function ExportBar() {
         >
           Clear all
         </button>
+        {isLoggedIn && (
+          <button
+            onClick={() => {}}
+            className="rounded-md border border-neutral-700 px-3 py-1.5 text-sm outline-none hover:bg-neutral-800 focus:outline-none focus-visible:outline-none active:outline-none"
+          >
+            Save
+          </button>
+        )}
         <button
           onClick={onExport}
           disabled={busy || photos.length === 0}
@@ -56,6 +101,14 @@ export function ExportBar() {
         >
           {busy ? 'Exporting…' : 'Download all (.zip)'}
         </button>
+        {isLoggedIn && (
+          <button
+            onClick={onLogout}
+            className="rounded-md border border-neutral-700 px-3 py-1.5 text-sm outline-none hover:bg-neutral-800 focus:outline-none focus-visible:outline-none active:outline-none"
+          >
+            Log out
+          </button>
+        )}
         <input
           ref={inputRef}
           type="file"
