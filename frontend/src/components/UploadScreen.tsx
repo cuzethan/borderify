@@ -49,15 +49,10 @@ export function UploadScreen() {
           hover ? 'border-emerald-400 bg-emerald-400/5' : 'border-neutral-700 bg-neutral-900/50 hover:border-neutral-500',
         ].join(' ')}
       >
-        <button
-          type="button"
-          onClick={() => window.location.href = '/'}
-          className="mb-2 flex items-center text-4xl font-bold tracking-tight rounded-md px-2 py-1 hover:bg-neutral-700/40"
-          aria-label="Return to homepage"
-        >
-            <img src="/logo.png" alt="Borderify logo" style={{ width: 34, height: 34, marginRight: 10 }} />
+        <div className="mb-2 flex items-center text-4xl font-bold tracking-tight rounded-md px-2 py-1">
+          <img src="/logo.png" alt="Borderify logo" style={{ width: 34, height: 34, marginRight: 10 }} />
           <span>Borderify</span>
-        </button>
+        </div>
         <p className="mb-8 max-w-md text-neutral-400">
           Drop your photos here to add Instagram-safe borders. No cropping, mixed orientations welcome.
         </p>
