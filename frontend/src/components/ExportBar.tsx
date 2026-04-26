@@ -8,10 +8,12 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? '/api';
+const SAFE_UPLOAD_LIMIT_BYTES = 3_500_000; // Keep below Vercel payload limit with multipart overhead.
 
 interface PreparedUpload {
   blob: Blob;
   fileName: string;
+  aggressiveCompression: boolean;
 }
 
 async function canvasToJpegBlob(
@@ -33,7 +35,7 @@ async function canvasToJpegBlob(
 async function prepareImageForUpload(
   bitmap: ImageBitmap,
   originalFileName: string,
-  maxBytes = 10 * 1024 * 1024,
+  maxBytes = SAFE_UPLOAD_LIMIT_BYTES,
 ): Promise<PreparedUpload> {
   const canvas = document.createElement('canvas');
   let width = bitmap.width;
@@ -55,7 +57,8 @@ async function prepareImageForUpload(
     for (const quality of [0.9, 0.8, 0.7, 0.6, 0.5, 0.4]) {
       const blob = await canvasToJpegBlob(canvas, quality);
       if (blob.size <= maxBytes) {
-        return { blob, fileName: uploadName };
+        const aggressiveCompression = scaleStep >= 2 || quality <= 0.5;
+        return { blob, fileName: uploadName, aggressiveCompression };
       }
     }
 
@@ -63,8 +66,22 @@ async function prepareImageForUpload(
     height *= 0.85;
   }
 
-  const fallbackBlob = await canvasToJpegBlob(canvas, 0.35);
-  return { blob: fallbackBlob, fileName: uploadName };
+  // Final safeguard: continue shrinking/quality drop so multipart requests stay under backend limits.
+  for (let guardStep = 0; guardStep < 6; guardStep += 1) {
+    const fallbackBlob = await canvasToJpegBlob(canvas, 0.35 - guardStep * 0.05);
+    if (fallbackBlob.size <= maxBytes) {
+      return { blob: fallbackBlob, fileName: uploadName, aggressiveCompression: true };
+    }
+    width *= 0.8;
+    height *= 0.8;
+    canvas.width = Math.max(1, Math.round(width));
+    canvas.height = Math.max(1, Math.round(height));
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  }
+
+  const smallestBlob = await canvasToJpegBlob(canvas, 0.1);
+  return { blob: smallestBlob, fileName: uploadName, aggressiveCompression: true };
 }
 
 interface CloudinaryUploadResult {
@@ -156,6 +173,7 @@ export function ExportBar() {
   const [isSaving, setIsSaving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const [saveWarning, setSaveWarning] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
@@ -186,15 +204,18 @@ export function ExportBar() {
       return;
     }
     setIsSaving(true);
+    setSaveWarning(null);
     try {
       setSaveStatus('Clearing previous saved photos...');
       await resetUserFolderViaBackend();
 
       const savedPhotos = [];
+      let aggressiveCompressionCount = 0;
       for (let i = 0; i < photos.length; i += 1) {
         const photo = photos[i];
         setSaveStatus(`Compressing photo ${i + 1}/${photos.length}...`);
         const prepared = await prepareImageForUpload(photo.bitmap, photo.fileName);
+        if (prepared.aggressiveCompression) aggressiveCompressionCount += 1;
         setSaveStatus(`Saving photo ${i + 1}/${photos.length}...`);
         const publicId = `${photo.id}_${Date.now()}_${i + 1}`;
         const uploaded = await uploadPreparedImageViaBackend(prepared, publicId);
@@ -225,6 +246,12 @@ export function ExportBar() {
       console.log('Saved session payload:', payload);
       setSaveStatus('Persisting session...');
       await saveSessionViaBackend(payload);
+      if (aggressiveCompressionCount > 0) {
+        const suffix = aggressiveCompressionCount === 1 ? '' : 's';
+        setSaveWarning(
+          `Saved with heavy compression on ${aggressiveCompressionCount} photo${suffix} to fit upload limits.`,
+        );
+      }
     } catch (error) {
       console.error(error);
       alert('Failed to save session. Check backend auth/Cloudinary config and try again.');
@@ -269,6 +296,7 @@ export function ExportBar() {
         </div>
 
       <div className="flex items-center gap-2">
+        {saveWarning && <span className="max-w-sm text-xs text-amber-300">{saveWarning}</span>}
         <button
           onClick={() => {
             if (confirm('Clear all photos?')) clearAll();
