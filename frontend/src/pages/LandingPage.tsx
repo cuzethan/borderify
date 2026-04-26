@@ -34,6 +34,13 @@ export function LandingPage(): JSX.Element {
           letter-spacing: -0.01em;
         }
 
+        .logo-img {
+          width: 34px;
+          height: 34px;
+          object-fit: contain;
+          margin-right: 10px;
+        }
+
         .nav-right {
           display: flex;
           align-items: center;
@@ -274,7 +281,10 @@ export function LandingPage(): JSX.Element {
 
       <div style={{ background: "#111110", color: "#e8e6e2" }}>
         <nav>
-          <span className="logo">Borderify</span>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/logo.png" alt="Borderify logo" className="logo-img" />
+            <span className="logo">Borderify</span>
+          </div>
           <div className="nav-right">
             <a href="#how" className="nav-link">
               How it works
