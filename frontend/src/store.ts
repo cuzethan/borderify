@@ -153,7 +153,29 @@ export const useStore = create<Store>((set, get) => ({
     set((s) => {
       const target = s.photos.find((p) => p.id === id);
       if (!target) return s;
-      const normalized = normalizeCrop(crop);
+      const requested = normalizeCrop(crop);
+      let normalized = requested;
+
+      if (target.splitOf) {
+        if (target.splitOf.half === 'left') {
+          const reflectedEdge = target.crop.x + target.crop.w;
+          const width = Math.max(0.01, reflectedEdge - requested.x);
+          normalized = normalizeCrop({
+            x: requested.x,
+            y: requested.y,
+            w: width,
+            h: requested.h,
+          });
+        } else {
+          const width = Math.max(0.01, requested.x + requested.w);
+          normalized = normalizeCrop({
+            x: 0,
+            y: requested.y,
+            w: width,
+            h: requested.h,
+          });
+        }
+      }
 
       let mirrorId: string | null = null;
       let mirroredCrop: CropRect | null = null;

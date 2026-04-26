@@ -196,7 +196,9 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
 
   const showSnapGuides = snapping && isVisiblyCentered(photo);
   const showGrid = !gridlinesHidden;
-  const isSymmetricCropEnabled = symmetricCrop && !photo.splitOf;
+  const isSymmetricCropEnabled = symmetricCrop;
+  const splitHalf = photo.splitOf?.half;
+  const lockedReflectedSideHandle = splitHalf === 'left' ? 'e' : splitHalf === 'right' ? 'w' : null;
   const baseDest = computeBaseDestRect(photo);
   const crop = cropForFrame;
   const cropLeft = (baseDest.dx + baseDest.dw * crop.x) * displayScale;
@@ -221,8 +223,9 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
     if (!drag) return;
     const dx = (e.clientX - drag.startX) / displayScale;
     const dy = (e.clientY - drag.startY) / displayScale;
+    const allowHorizontalMove = !photo.splitOf;
     const next = normalizeCrop({
-      x: drag.crop.x + dx / drag.baseW,
+      x: allowHorizontalMove ? drag.crop.x + dx / drag.baseW : drag.crop.x,
       y: drag.crop.y + dy / drag.baseH,
       w: drag.crop.w,
       h: drag.crop.h,
@@ -261,8 +264,15 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
     let { x, y, w, h } = state.cropRectPx;
     const right = x + w;
     const bottom = y + h;
+    const isSplit = Boolean(splitHalf);
+    const canResizeWest = !isSplit || splitHalf === 'left';
+    const canResizeEast = !isSplit || splitHalf === 'right';
+    const allowHorizontalSymmetric = isSymmetricCropEnabled && !isSplit;
+    const allowVerticalSymmetric = isSymmetricCropEnabled;
     if (state.handle.includes('w')) {
-      if (isSymmetricCropEnabled) {
+      if (!canResizeWest) {
+        // Keep reflected side locked for split crops.
+      } else if (allowHorizontalSymmetric) {
         x = x + dx;
         w = w - 2 * dx;
       } else {
@@ -272,7 +282,9 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
       }
     }
     if (state.handle.includes('e')) {
-      if (isSymmetricCropEnabled) {
+      if (!canResizeEast) {
+        // Keep reflected side locked for split crops.
+      } else if (allowHorizontalSymmetric) {
         x = x - dx;
         w = w + 2 * dx;
       } else {
@@ -280,7 +292,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
       }
     }
     if (state.handle.includes('n')) {
-      if (isSymmetricCropEnabled) {
+      if (allowVerticalSymmetric) {
         y = y + dy;
         h = h - 2 * dy;
       } else {
@@ -290,7 +302,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
       }
     }
     if (state.handle.includes('s')) {
-      if (isSymmetricCropEnabled) {
+      if (allowVerticalSymmetric) {
         y = y - dy;
         h = h + 2 * dy;
       } else {
@@ -379,25 +391,29 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
                 touchAction: 'none',
               }}
             />
-            {hovered && HANDLES.map((h) => {
-              const x = cropLeft + cropW * h.xFrac;
-              const y = cropTop + cropH * h.yFrac;
-              return (
-                <div
-                  key={h.id}
-                  onPointerDown={(e) => onCropHandleDown(e, h.id)}
-                  onPointerMove={onCropHandleMove}
-                  onPointerUp={onCropHandleUp}
-                  className="absolute h-3 w-3 rounded-sm border border-sky-300 bg-sky-400 shadow"
-                  style={{
-                    left: x - 6,
-                    top: y - 6,
-                    cursor: h.cursor,
-                    touchAction: 'none',
-                  }}
-                />
-              );
-            })}
+            {hovered &&
+              HANDLES.filter((h) => {
+                if (!lockedReflectedSideHandle) return true;
+                return !h.id.includes(lockedReflectedSideHandle);
+              }).map((h) => {
+                const x = cropLeft + cropW * h.xFrac;
+                const y = cropTop + cropH * h.yFrac;
+                return (
+                  <div
+                    key={h.id}
+                    onPointerDown={(e) => onCropHandleDown(e, h.id)}
+                    onPointerMove={onCropHandleMove}
+                    onPointerUp={onCropHandleUp}
+                    className="absolute h-3 w-3 rounded-sm border border-sky-300 bg-sky-400 shadow"
+                    style={{
+                      left: x - 6,
+                      top: y - 6,
+                      cursor: h.cursor,
+                      touchAction: 'none',
+                    }}
+                  />
+                );
+              })}
           </>
         )}
 

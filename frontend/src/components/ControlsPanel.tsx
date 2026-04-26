@@ -113,7 +113,7 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
           <label
             className={[
               'mt-2 flex items-center gap-2 text-xs',
-              isSplitHalf ? 'cursor-not-allowed text-neutral-500' : 'cursor-pointer text-neutral-300',
+              'cursor-pointer text-neutral-300',
             ].join(' ')}
           >
             <div className="relative flex items-center justify-center">
@@ -121,8 +121,7 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
                 type="checkbox"
                 checked={symmetricCrop}
                 onChange={toggleSymmetricCrop}
-                disabled={isSplitHalf}
-                className="peer h-3.5 w-3.5 appearance-none rounded-sm border border-neutral-600 bg-neutral-800 checked:border-emerald-500 checked:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="peer h-3.5 w-3.5 appearance-none rounded-sm border border-neutral-600 bg-neutral-800 checked:border-emerald-500 checked:bg-emerald-500"
               />
               <svg
                 className="pointer-events-none absolute hidden h-3.5 w-3.5 text-black peer-checked:block"
@@ -136,7 +135,9 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
           </label>
         )}
         {editorMode === 'crop' && isSplitHalf ? (
-          <p className="mt-1 text-xs text-neutral-500">Disabled for split halves.</p>
+          <p className="mt-1 text-xs text-neutral-500">
+            Split crops always allow top/bottom. With symmetric crop off, only the non-reflected side can be cropped.
+          </p>
         ) : null}
       </Section>
 
