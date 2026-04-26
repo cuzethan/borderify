@@ -18,8 +18,8 @@ Add your own assets under `docs/` (folder optional until you add files):
 
 ![Borderify demo](docs/demo.gif)
 
-| ![Editor screenshot](docs/editor.png) | ![Carousel split screenshot](docs/split.png) | ![Export screenshot](docs/export.png) |
-| --- | --- | --- |
+| ![Editor screenshot](docs/editor.png) | ![Carousel split screenshot](docs/split.png) |
+| --- | --- |
 
 ---
 
@@ -221,13 +221,14 @@ borderify/
 ### 1. Clone
 
 ```bash
-git clone https://github.com/cuzethan/sjhacks
-cd sjhacks
+git clone https://github.com/cuzethan/borderify.git
+cd borderify
 ```
 
 ### 2. Run the frontend
 
 The editor, framing, crop/move tools, and zip export work **without** the backend or an account.
+The backend is optional, but the current frontend still initializes Supabase auth/session on app load, so you should provide Supabase env vars in `frontend/.env`.
 
 ```bash
 cd frontend
@@ -237,7 +238,7 @@ npm run dev
 
 Open **http://localhost:5173**.
 
-Create **`frontend/.env`** if you use Supabase auth or cloud save (values from your Supabase project → Settings → API):
+Create **`frontend/.env`** (required by current app boot/auth checks; values from your Supabase project → Settings → API):
 
 ```bash
 VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
