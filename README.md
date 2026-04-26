@@ -17,6 +17,8 @@ Common camera outputs like 3:2, 2:3, panoramic, and mixed-orientation sets don't
 | ![Editor screenshot](docs/editor.png) | ![Carousel split screenshot](docs/split.png) |
 | --- | --- |
 
+Watch the demo video: [https://youtu.be/XPusJlderWk](https://youtu.be/XPusJlderWk)
+
 ---
 
 ## Features

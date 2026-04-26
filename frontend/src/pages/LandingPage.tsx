@@ -208,7 +208,19 @@ export function LandingPage(): JSX.Element {
           </a>
 
           <div className="footer-center">
-            <span className="footer-copy">Brendan Ly · Ethan Le · Jason Nguyen</span>
+            <span className="footer-copy">
+              <a href="https://www.linkedin.com/in/brendan-ly34/" target="_blank" rel="noopener noreferrer">Brendan Ly</a>
+              {' · '}
+              <a href="https://www.linkedin.com/in/le-ethan/" target="_blank" rel="noopener noreferrer">Ethan Le</a>
+              {' · '}
+              <a href="https://www.linkedin.com/in/jnguyen2617/" target="_blank" rel="noopener noreferrer">Jason Nguyen</a>
+            </span>
+            <div className="linkedin-cta" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4.98 3.5C4.98 4.88 3.87 6 2.49 6S0 4.88 0 3.5 1.11 1 2.49 1s2.49 1.12 2.49 2.5ZM.5 8h4V24h-4V8Zm7 0h3.83v2.19h.06c.53-1.01 1.84-2.08 3.79-2.08 4.05 0 4.8 2.67 4.8 6.14V24h-4v-7.33c0-1.75-.03-4-2.44-4-2.44 0-2.81 1.9-2.81 3.87V24h-4V8Z" />
+              </svg>
+              <span>LinkedIn</span>
+            </div>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
