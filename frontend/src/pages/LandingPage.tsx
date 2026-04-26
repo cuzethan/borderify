@@ -1,8 +1,11 @@
 import { useEffect, useRef } from 'react';
+import { useStore } from '../store';
 
 export function LandingPage(): JSX.Element {
   const leftRef = useRef<HTMLImageElement>(null);
   const rightRef = useRef<HTMLImageElement>(null);
+  const user = useStore((s) => s.user);
+  const logout = useStore((s) => s.logout);
 
   useEffect(() => {
     let rafId: number;
@@ -431,8 +434,19 @@ export function LandingPage(): JSX.Element {
                 </span>
               </div>
           <div className="nav-right">
-            <a href="/login" className="btn" style={{ backgroundColor: '#ffffff' }}>Log in</a>
-            <a href="/signup" className="btn" style={{ backgroundColor: "#10B981", color: "black" }}>Sign up</a>
+            {user ? (
+              <>
+                <span className="nav-link">Logged in as {user.email}</span>
+                <button className="btn" style={{ backgroundColor: '#ffffff', cursor: 'pointer', border: 'none' }} onClick={logout}>
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="btn" style={{ backgroundColor: '#ffffff' }}>Log in</a>
+                <a href="/signup" className="btn" style={{ backgroundColor: "#10B981", color: "black" }}>Sign up</a>
+              </>
+            )}
           </div>
         </nav>
 
