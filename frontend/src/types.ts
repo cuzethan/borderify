@@ -10,7 +10,7 @@ export interface BorderConfig {
   blurAmount: number;
 }
 
-export type SplitHalf = 'left' | 'right' | 'top' | 'bottom';
+export type SplitHalf = 'left' | 'right';
 
 export interface PhotoConfig {
   id: string;

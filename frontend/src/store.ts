@@ -12,7 +12,7 @@ export interface SavedPhoto {
   offsetX: number;
   offsetY: number;
   scale: number;
-  splitOf?: { sourceId: string; half: 'left' | 'right' | 'top' | 'bottom' } | null;
+  splitOf?: { sourceId: string; half: 'left' | 'right' } | null;
   imageUrl: string;
 }
 

@@ -23,19 +23,16 @@ export function nextId(): string {
   return `p${Date.now().toString(36)}_${idCounter}`;
 }
 
-/** Decide which split direction (if any) makes sense for this image+canvas combo. */
-export function splitDirectionFor(photo: PhotoConfig): 'horizontal' | 'vertical' | null {
+/** Decide whether this image should be split into left/right halves. */
+export function splitDirectionFor(photo: PhotoConfig): 'horizontal' | null {
   const imgRatio = photo.naturalW / photo.naturalH;
   // Landscape image in portrait/square canvas → split left/right (horizontal split of the image into 2 portrait halves)
   if (imgRatio > 1.4 && photo.preset !== 'landscape') return 'horizontal';
-  // Portrait image in landscape canvas → split top/bottom
-  if (imgRatio < 0.85 && photo.preset === 'landscape') return 'vertical';
   return null;
 }
 
 export function makeSplitPair(photo: PhotoConfig): [PhotoConfig, PhotoConfig] | null {
-  const dir = splitDirectionFor(photo);
-  if (!dir) return null;
+  if (!splitDirectionFor(photo)) return null;
   const base: Omit<PhotoConfig, 'id' | 'splitOf'> = {
     fileName: photo.fileName,
     bitmap: photo.bitmap,
@@ -47,15 +44,9 @@ export function makeSplitPair(photo: PhotoConfig): [PhotoConfig, PhotoConfig] | 
     offsetY: 0,
     scale: 1,
   };
-  if (dir === 'horizontal') {
-    return [
-      { ...base, id: nextId(), splitOf: { sourceId: photo.id, half: 'left' } },
-      { ...base, id: nextId(), splitOf: { sourceId: photo.id, half: 'right' } },
-    ];
-  }
   return [
-    { ...base, id: nextId(), splitOf: { sourceId: photo.id, half: 'top' } },
-    { ...base, id: nextId(), splitOf: { sourceId: photo.id, half: 'bottom' } },
+    { ...base, id: nextId(), splitOf: { sourceId: photo.id, half: 'left' } },
+    { ...base, id: nextId(), splitOf: { sourceId: photo.id, half: 'right' } },
   ];
 }
 

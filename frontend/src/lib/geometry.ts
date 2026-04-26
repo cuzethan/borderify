@@ -33,10 +33,6 @@ export function sliceForHalf(srcW: number, srcH: number, half: SplitHalf): Sourc
       return { sx: 0, sy: 0, sw: srcW / 2, sh: srcH };
     case 'right':
       return { sx: srcW / 2, sy: 0, sw: srcW / 2, sh: srcH };
-    case 'top':
-      return { sx: 0, sy: 0, sw: srcW, sh: srcH / 2 };
-    case 'bottom':
-      return { sx: 0, sy: srcH / 2, sw: srcW, sh: srcH / 2 };
   }
 }
 

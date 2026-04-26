@@ -87,14 +87,14 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
       {canSplit ? (
         <Section title="Carousel split">
           <p className="mb-2 text-xs text-neutral-400">
-            This {splitDir === 'horizontal' ? 'landscape' : 'portrait'} photo doesn't fit the {photo.preset} canvas
-            naturally. Split it into two posts so it reads as one image when scrolling.
+            This landscape photo doesn't fit the {photo.preset} canvas naturally. Split it into two posts so it reads
+            as one image when scrolling.
           </p>
           <button
             onClick={() => splitPhoto(photo.id)}
             className="w-full rounded-md bg-amber-500 px-3 py-2 text-xs font-semibold text-black hover:bg-amber-400"
           >
-            Split into 2 posts ({splitDir === 'horizontal' ? 'left + right' : 'top + bottom'})
+            Split into 2 posts (left + right)
           </button>
         </Section>
       ) : null}
