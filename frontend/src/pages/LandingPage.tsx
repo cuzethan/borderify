@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { useStore } from '../store';
+import { supabase } from '../lib/supabase';
 
 export function LandingPage(): JSX.Element {
   const leftRef = useRef<HTMLImageElement>(null);
   const rightRef = useRef<HTMLImageElement>(null);
   const user = useStore((s) => s.user);
-  const logout = useStore((s) => s.logout);
+  const logout = () => supabase.auth.signOut();
 
   useEffect(() => {
     let rafId: number;

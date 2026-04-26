@@ -1,11 +1,33 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { LoginPage } from './pages/LoginPage';
 import { LandingPage } from './pages/LandingPage';
 import { SignupPage } from './pages/SignupPage';
 import { AppPage } from './pages/AppPage';
+import { supabase } from './lib/supabase';
+import { useStore } from './store';
 
 export function App() {
+  const login = useStore((s) => s.login);
+  const logout = useStore((s) => s.logout);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user?.email) login(session.user.email);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user?.email) {
+        login(session.user.email);
+      } else {
+        logout();
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
