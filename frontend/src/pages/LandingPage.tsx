@@ -35,8 +35,8 @@ export function LandingPage(): JSX.Element {
         body {
           font-family: 'Inter', system-ui, sans-serif;
           font-weight: 300;
-          background: #111110;
-          color: #e8e6e2;
+          background: #111111;
+          color: #e8e8e8;
           line-height: 1.6;
         }
 
@@ -47,7 +47,7 @@ export function LandingPage(): JSX.Element {
           align-items: center;
           justify-content: space-between;
           padding: 1.75rem 2.5rem;
-          border-bottom: 1px solid #222220;
+          border-bottom: 1px solid #222222;
         }
 
         .logo {
@@ -75,15 +75,15 @@ export function LandingPage(): JSX.Element {
           transition: color 0.15s;
         }
 
-        .nav-link:hover { color: #e8e6e2; }
+        .nav-link:hover { color: #e8e8e8; }
 
         .btn {
           font-size: 0.9375rem;
           font-weight: 400;
           padding: 0.65rem 1.5rem;
           border-radius: 6px;
-          background: #e8e6e2;
-          color: #111110;
+          background: #e8e8e8;
+          color: #111111;
           transition: opacity 0.15s;
         }
 
@@ -129,8 +129,8 @@ export function LandingPage(): JSX.Element {
           font-size: 0.9375rem;
           padding: 0.75rem 1.75rem;
           border-radius: 8px;
-          background: #e8e6e2;
-          color: #111110;
+          background: #e8e8e8;
+          color: #111111;
           font-weight: 400;
           transition: opacity 0.15s;
         }
@@ -143,7 +143,7 @@ export function LandingPage(): JSX.Element {
           transition: color 0.15s;
         }
 
-        .link-subtle:hover { color: #e8e6e2; }
+        .link-subtle:hover { color: #e8e8e8; }
 
         .preview {
           max-width: 860px;
@@ -152,13 +152,26 @@ export function LandingPage(): JSX.Element {
         }
 
         .preview-inner {
-          background: #1a1a18;
+          background: #1a1a1a;
           border-radius: 16px;
           padding: 2.5rem;
           display: flex;
-          gap: 1.25rem;
-          align-items: flex-start;
+          gap: 1.5rem;
+          align-items: flex-end;
           justify-content: center;
+        }
+
+        .photo-card-wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.65rem;
+        }
+
+        .card-label {
+          font-size: 0.9rem;
+          color: #666;
+          text-align: center;
         }
 
         .photo-card {
@@ -168,9 +181,9 @@ export function LandingPage(): JSX.Element {
           overflow: hidden;
         }
 
-        .photo-card-portrait { width: 140px; height: 175px; }
-        .photo-card-square   { width: 160px; height: 160px; align-self: center; }
-  .photo-card-land     { width: 190px; height: 100px; align-self: center; }
+        .photo-card-portrait { width: 195px; height: 244px; }
+        .photo-card-square   { width: 215px; height: 215px; }
+        .photo-card-land     { width: 275px; height: 144px; }
 
         .photo-fill {
           position: absolute;
@@ -211,11 +224,58 @@ export function LandingPage(): JSX.Element {
         .border-sm { border-width: 4px; }
         .border-lg { border-width: 4px; }
 
+        .demo {
+          max-width: 860px;
+          margin: 0 auto;
+          padding: 0 2rem 6rem;
+        }
+
+        .demo-heading {
+          font-family: 'Lora', serif;
+          font-size: 1.5rem;
+          font-weight: 400;
+          letter-spacing: -0.01em;
+          margin-bottom: 1.75rem;
+          text-align: center;
+        }
+
+        .demo-video-placeholder {
+          width: 100%;
+          aspect-ratio: 16 / 9;
+          background: #1a1a1a;
+          border-radius: 12px;
+          border: 2px dashed #333;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #444;
+          font-size: 0.875rem;
+          margin-bottom: 1rem;
+        }
+
+        .demo-photos {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
+        }
+
+        .demo-photo-placeholder {
+          aspect-ratio: 4 / 3;
+          background: #1a1a1a;
+          border-radius: 8px;
+          border: 2px dashed #333;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #444;
+          font-size: 0.8rem;
+        }
+
         .steps {
           max-width: 640px;
           margin: 0 auto;
           padding: 4rem 2rem 6rem;
-          border-top: 1px solid #222220;
+          border-top: 1px solid #222222;
         }
 
         .section-heading {
@@ -231,7 +291,7 @@ export function LandingPage(): JSX.Element {
           grid-template-columns: 28px 1fr;
           gap: 0 1.25rem;
           padding: 1.25rem 0;
-          border-bottom: 1px solid #222220;
+          border-bottom: 1px solid #222222;
         }
 
         .step:last-child { border-bottom: none; }
@@ -256,7 +316,7 @@ export function LandingPage(): JSX.Element {
         }
 
         .features {
-          background: linear-gradient(to right, #111110 0%, #1a1a18 12%, #1a1a18 88%, #111110 100%);
+          background: linear-gradient(to right, #111111 0%, #1a1a1a 12%, #1a1a1a 88%, #111111 100%);
           padding: 4rem 2rem;
         }
 
@@ -269,15 +329,15 @@ export function LandingPage(): JSX.Element {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 1px;
-          background: #252523;
-          border: 1px solid #252523;
+          background: #252525;
+          border: 1px solid #252525;
           border-radius: 10px;
           overflow: hidden;
           margin-top: 2rem;
         }
 
         .feature-item {
-          background: #1a1a18;
+          background: #1a1a1a;
           padding: 1.25rem 1.5rem;
         }
 
@@ -298,7 +358,7 @@ export function LandingPage(): JSX.Element {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-top: 1px solid #222220;
+          border-top: 1px solid #222222;
         }
 
         .footer-logo {
@@ -350,8 +410,8 @@ export function LandingPage(): JSX.Element {
           height: 44px;
           border-radius: 10px;
           background: transparent;
-          border: 1px solid #2a2a28;
-          color: #e8e6e2;
+          border: 1px solid #2a2a2a;
+          color: #e8e8e8;
           transition: background 0.12s, opacity 0.12s, transform 0.08s;
           font-size: 0.98rem;
           font-weight: 600;
@@ -421,7 +481,7 @@ export function LandingPage(): JSX.Element {
         }
       `}</style>
 
-      <div style={{ background: "#111110", color: "#e8e6e2" }}>
+      <div style={{ background: "#111111", color: "#e8e8e8" }}>
         <div className="page-content">
         <nav>
           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -480,18 +540,39 @@ export function LandingPage(): JSX.Element {
 
         <div className="preview">
           <div className="preview-inner">
-            <div className="photo-card photo-card-portrait">
-              <img src="/DSC_0438.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div className="border-frame border-lg" />
+            <div className="photo-card-wrapper">
+              <div className="photo-card photo-card-portrait">
+                <img src="/DSC_0438.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div className="border-frame border-lg" />
+              </div>
+              <span className="card-label">Portrait (4:5)</span>
             </div>
-            <div className="photo-card photo-card-land">
-              <img src="/DSC_0694.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div className="border-frame border-sm" />
+            <div className="photo-card-wrapper">
+              <div className="photo-card photo-card-land">
+                <img src="/DSC_0694.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div className="border-frame border-sm" />
+              </div>
+              <span className="card-label">Landscape (1.91:1)</span>
             </div>
-            <div className="photo-card photo-card-square">
-              <img src="/DSCF4009.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div className="border-frame" />
+            <div className="photo-card-wrapper">
+              <div className="photo-card photo-card-square">
+                <img src="/DSCF4009.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div className="border-frame" />
+              </div>
+              <span className="card-label">Square (1:1)</span>
             </div>
+          </div>
+        </div>
+
+        <div className="demo">
+          <div className="demo-heading">See it in action</div>
+          <div className="demo-video-placeholder">
+            Demo video placeholder
+          </div>
+          <div className="demo-photos">
+            <div className="demo-photo-placeholder">Screenshot 1</div>
+            <div className="demo-photo-placeholder">Screenshot 2</div>
+            <div className="demo-photo-placeholder">Screenshot 3</div>
           </div>
         </div>
 
