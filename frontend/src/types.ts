@@ -1,6 +1,6 @@
 export type CanvasPreset = 'portrait' | 'landscape' | 'square';
 
-export type BorderType = 'solid' | 'blurred' | 'gradient' | 'stripes';
+export type BorderType = 'solid' | 'blurred' | 'gradient';
 
 export interface BorderConfig {
   type: BorderType;
@@ -8,7 +8,6 @@ export interface BorderConfig {
   color2: string;
   gradientAngle: number;
   blurAmount: number;
-  stripeWidth: number;
 }
 
 export type SplitHalf = 'left' | 'right' | 'top' | 'bottom';

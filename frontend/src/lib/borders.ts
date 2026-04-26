@@ -15,9 +15,6 @@ export function drawBorder(ctx: CanvasRenderingContext2D, config: PhotoConfig): 
     case 'gradient':
       drawGradient(ctx, w, h, b);
       break;
-    case 'stripes':
-      drawStripes(ctx, w, h, b);
-      break;
   }
 }
 
@@ -60,23 +57,3 @@ function drawGradient(ctx: CanvasRenderingContext2D, w: number, h: number, b: Bo
   ctx.fillRect(0, 0, w, h);
 }
 
-function drawStripes(ctx: CanvasRenderingContext2D, w: number, h: number, b: BorderConfig): void {
-  const sw = Math.max(2, Math.floor(b.stripeWidth));
-  const patternCanvas = document.createElement('canvas');
-  patternCanvas.width = sw * 2;
-  patternCanvas.height = sw * 2;
-  const pctx = patternCanvas.getContext('2d')!;
-  pctx.fillStyle = b.color;
-  pctx.fillRect(0, 0, sw * 2, sw * 2);
-  pctx.fillStyle = b.color2;
-  // Diagonal stripe: draw a rotated rect that covers half
-  pctx.save();
-  pctx.translate(sw, sw);
-  pctx.rotate(Math.PI / 4);
-  pctx.fillRect(-sw * 2, 0, sw * 4, sw);
-  pctx.restore();
-
-  const pattern = ctx.createPattern(patternCanvas, 'repeat')!;
-  ctx.fillStyle = pattern;
-  ctx.fillRect(0, 0, w, h);
-}
