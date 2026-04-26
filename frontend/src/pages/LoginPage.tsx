@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createClient } from '@supabase/supabase-js';
+import { useStore } from '../store';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -11,6 +12,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
+  const login = useStore((s) => s.login);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -23,6 +25,7 @@ export function LoginPage() {
     if (error) {
       setErrorMsg('Invalid email or password.');
     } else {
+      login(email);
       navigate('/app');
     }
   }

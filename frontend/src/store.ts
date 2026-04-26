@@ -18,9 +18,13 @@ export interface SavedPhoto {
 }
 
 interface Store {
+  user: { email: string } | null;
   photos: PhotoConfig[];
   selectedId: string | null;
   gridlinesHidden: boolean;
+
+  login: (email: string) => void;
+  logout: () => void;
 
   addFiles: (files: File[]) => Promise<void>;
   removePhoto: (id: string) => void;
@@ -38,9 +42,13 @@ interface Store {
 }
 
 export const useStore = create<Store>((set, get) => ({
+  user: null,
   photos: [],
   selectedId: null,
   gridlinesHidden: false,
+
+  login: (email) => set({ user: { email } }),
+  logout: () => set({ user: null }),
 
   addFiles: async (files) => {
     const configs = await Promise.all(files.map((f) => initialPhotoConfig(f)));
