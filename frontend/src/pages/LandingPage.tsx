@@ -54,8 +54,8 @@ export function LandingPage(): JSX.Element {
               </>
             ) : (
               <>
-                <a href="/login" className="btn" style={{ backgroundColor: '#ffffff' }}>Log in</a>
-                <a href="/signup" className="btn" style={{ backgroundColor: "#10B981", color: "black" }}>Sign up</a>
+                <a href="/login" className="btn" style={{ backgroundColor: '#ffffff', fontWeight: 700 }}>Log in</a>
+                <a href="/signup" className="btn" style={{ backgroundColor: "#10B981", color: "black", fontWeight: 700 }}>Sign up</a>
               </>
             )}
           </div>
@@ -103,6 +103,13 @@ export function LandingPage(): JSX.Element {
           </div>
         </div>
 
+        <div className="demo">
+          <div className="demo-heading">See it in action</div>
+          <div className="demo-video-placeholder">
+            Demo video placeholder
+          </div>
+        </div>
+
         <div className="preview">
           <div className="preview-inner">
             <div className="photo-card-wrapper">
@@ -126,18 +133,6 @@ export function LandingPage(): JSX.Element {
               </div>
               <span className="card-label">Square (1:1)</span>
             </div>
-          </div>
-        </div>
-
-        <div className="demo">
-          <div className="demo-heading">See it in action</div>
-          <div className="demo-video-placeholder">
-            Demo video placeholder
-          </div>
-          <div className="demo-photos">
-            <div className="demo-photo-placeholder">Screenshot 1</div>
-            <div className="demo-photo-placeholder">Screenshot 2</div>
-            <div className="demo-photo-placeholder">Screenshot 3</div>
           </div>
         </div>
 
@@ -169,6 +164,8 @@ export function LandingPage(): JSX.Element {
           </div>
         </div>
 
+        </div>{/* sides-wrapper */}
+
         <div className="features">
           <div className="features-inner">
             <div className="section-heading">The details</div>
@@ -193,11 +190,9 @@ export function LandingPage(): JSX.Element {
           </div>
         </div>
 
-        </div>{/* sides-wrapper */}
-
         <footer>
           <a
-            href="https://sjhacks-2026.devpost.com/"
+            href="https://devpost.com/software/borderify"
             target="_blank"
             rel="noopener noreferrer"
             className="sjhacks-btn"
@@ -211,7 +206,7 @@ export function LandingPage(): JSX.Element {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <a href="https://github.com/cuzethan/sjhacks" className="github-btn" aria-label="View on GitHub">
+            <a href="https://github.com/cuzethan/borderify" className="github-btn" aria-label="View on GitHub">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.09-.745.083-.729.083-.729 1.205.085 1.84 1.237 1.84 1.237 1.07 1.835 2.807 1.305 3.492.998.108-.776.418-1.305.762-1.605-2.665-.3-5.467-1.332-5.467-5.93 0-1.31.47-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.77.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.898-.015 3.293 0 .315.21.694.825.576C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
               </svg>

@@ -78,7 +78,7 @@ export function LoginPage() {
 
           <button
             type="submit"
-            className="mt-2 rounded-lg bg-emerald-500 py-2.5 text-sm font-semibold text-black hover:bg-emerald-400"
+            className="mt-2 rounded-lg bg-emerald-500 py-2.5 text-sm font-semibold text-black hover:bg-emerald-400 cursor-pointer"
           >
             Sign in
           </button>

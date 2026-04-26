@@ -435,10 +435,10 @@
 
 .landing .side-photo-img {
   position: absolute;
-  top: -300px;
+  top: -980px;
   left: 0;
   width: 100%;
-  height: calc(100% + 600px);
+  height: calc(100% + 1960px);
   object-fit: cover;
   filter: blur(1px);
   opacity: 0.35;
