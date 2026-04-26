@@ -35,7 +35,19 @@ export function UploadScreen() {
   }
 
   return (
-    <div className="flex flex-col h-full w-full items-center justify-center p-8">
+    <div className="flex flex-col h-full w-full items-center justify-center p-8 relative overflow-hidden">
+      <div
+        style={{
+          backgroundImage: 'url(/IMG_0741.JPG)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(12px)',
+          transform: 'scale(1.08)',
+        }}
+        className="absolute inset-0 z-0"
+      />
+      <div className="absolute inset-0 z-0 bg-black/50" />
+      <div className="relative z-10 w-full flex flex-col items-center">
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -56,7 +68,7 @@ export function UploadScreen() {
         <p className="mb-8 max-w-md text-neutral-400">
           Drop your photos here to add Instagram-safe borders. No cropping, mixed orientations welcome.
         </p>
-        <div className="rounded-lg bg-emerald-500 px-6 py-3 text-sm font-semibold text-black">
+        <div className="rounded-lg bg-emerald-500 px-6 py-3 text-sm font-semibold text-black transition-colors duration-150 hover:bg-emerald-400">
           {busy ? 'Loading…' : 'Choose photos or drop here'}
         </div>
         <p className="mt-6 text-xs text-neutral-500">PNG or JPG, multiple files</p>
@@ -79,6 +91,7 @@ export function UploadScreen() {
             Return to Homepage
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

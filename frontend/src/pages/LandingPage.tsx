@@ -1,4 +1,26 @@
+import { useEffect, useRef } from 'react';
+
 export function LandingPage(): JSX.Element {
+  const leftRef = useRef<HTMLImageElement>(null);
+  const rightRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    let rafId: number;
+    const handleScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        const y = window.scrollY * 0.18;
+        if (leftRef.current) leftRef.current.style.transform = `translateY(${y}px)`;
+        if (rightRef.current) rightRef.current.style.transform = `translateY(${y}px)`;
+      });
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   return (
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -183,11 +205,11 @@ export function LandingPage(): JSX.Element {
         .border-frame {
           position: absolute;
           inset: 0;
-          border: 14px solid #111110;
+          border: 4px solid #444;
         }
 
-        .border-sm { border-width: 10px; }
-        .border-lg { border-width: 18px; }
+        .border-sm { border-width: 4px; }
+        .border-lg { border-width: 4px; }
 
         .steps {
           max-width: 640px;
@@ -234,7 +256,7 @@ export function LandingPage(): JSX.Element {
         }
 
         .features {
-          background: #1a1a18;
+          background: linear-gradient(to right, #111110 0%, #1a1a18 12%, #1a1a18 88%, #111110 100%);
           padding: 4rem 2rem;
         }
 
@@ -339,6 +361,55 @@ export function LandingPage(): JSX.Element {
 
         .github-btn svg { width: 22px; height: 22px; fill: currentColor; }
 
+        .sides-wrapper {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .side-photo {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: min(510px, calc((100vw - 600px) / 2));
+          overflow: hidden;
+          z-index: 0;
+          pointer-events: none;
+        }
+
+        .side-photo-left {
+          left: 0;
+          -webkit-mask-image: linear-gradient(to right, black 20%, transparent 60%);
+          mask-image: linear-gradient(to right, black 20%, transparent 60%);
+        }
+
+        .side-photo-right {
+          right: 0;
+          -webkit-mask-image: linear-gradient(to left, black 20%, transparent 60%);
+          mask-image: linear-gradient(to left, black 20%, transparent 60%);
+        }
+
+        .side-photo-img {
+          position: absolute;
+          top: -300px;
+          left: 0;
+          width: 100%;
+          height: calc(100% + 600px);
+          object-fit: cover;
+          filter: blur(1px);
+          opacity: 0.35;
+          will-change: transform;
+          transform: translateY(0px);
+        }
+
+        .page-content {
+          position: relative;
+          z-index: 1;
+        }
+
+        @media (max-width: 1100px) {
+          .side-photo { display: none; }
+        }
+
         @media (max-width: 600px) {
           nav { padding: 1.25rem; }
           .nav-link { display: none; }
@@ -351,6 +422,7 @@ export function LandingPage(): JSX.Element {
       `}</style>
 
       <div style={{ background: "#111110", color: "#e8e6e2" }}>
+        <div className="page-content">
         <nav>
           <div style={{ display: 'flex', alignItems: 'center' }}>
                 <img src="/logo.png" alt="Borderify logo" className="logo-img" style={{ marginRight: 10, width: 36, height: 36 }} />
@@ -363,6 +435,14 @@ export function LandingPage(): JSX.Element {
             <a href="/signup" className="btn" style={{ backgroundColor: "#10B981", color: "black" }}>Sign up</a>
           </div>
         </nav>
+
+        <div className="sides-wrapper">
+          <div className="side-photo side-photo-left">
+            <img ref={leftRef} src="/DSCF3432.jpg" alt="" className="side-photo-img" />
+          </div>
+          <div className="side-photo side-photo-right">
+            <img ref={rightRef} src="/DSCF4076.jpg" alt="" className="side-photo-img" />
+          </div>
 
         <div className="hero">
           <h1>
@@ -385,7 +465,14 @@ export function LandingPage(): JSX.Element {
           </div>
 
           <div style={{ marginTop: "1rem" }}>
-            <a href="#how" className="link-subtle">
+            <a
+              href="#how"
+              className="link-subtle"
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
               How it works →
             </a>
           </div>
@@ -394,19 +481,16 @@ export function LandingPage(): JSX.Element {
         <div className="preview">
           <div className="preview-inner">
             <div className="photo-card photo-card-portrait">
-              <div className="photo-fill sky" />
-              <div className="photo-fill earth" />
+              <img src="/DSC_0438.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               <div className="border-frame border-lg" />
             </div>
-            <div className="photo-card photo-card-square">
-              <div className="photo-fill sky" />
-              <div className="photo-fill earth" />
-              <div className="border-frame" />
-            </div>
             <div className="photo-card photo-card-land">
-              <div className="photo-fill sky" />
-              <div className="photo-fill earth" />
+              <img src="/DSC_0694.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               <div className="border-frame border-sm" />
+            </div>
+            <div className="photo-card photo-card-square">
+              <img src="/DSCF4009.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div className="border-frame" />
             </div>
           </div>
         </div>
@@ -463,6 +547,8 @@ export function LandingPage(): JSX.Element {
           </div>
         </div>
 
+        </div>{/* sides-wrapper */}
+
         <footer>
           <div style={{ width: 120 }} />
 
@@ -479,6 +565,7 @@ export function LandingPage(): JSX.Element {
             </a>
           </div>
         </footer>
+        </div>
       </div>
     </>
   );

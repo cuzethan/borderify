@@ -94,7 +94,7 @@ export function SignupPage() {
 
         <div className="mt-6 text-center">
           <Link to="/" className="text-xs text-neutral-600 hover:text-neutral-400">
-            ← Back to editor
+            ← Back to homepage
           </Link>
         </div>
       </div>
