@@ -3,3 +3,5 @@ uvicorn[standard]
 httpx
 python-jose[cryptography]
 pydantic-settings
+cloudinary
+python-multipart

@@ -89,7 +89,7 @@ async def get_current_user(
         payload = jwt.decode(
             token,
             key,
-            algorithms=["RS256"],
+            algorithms=["RS256", "ES256"],
             audience=settings.supabase_jwt_audience,
             issuer=settings.supabase_issuer,
             options={
