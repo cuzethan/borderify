@@ -14,7 +14,6 @@ export function defaultBorder(): BorderConfig {
     color2: '#000000',
     gradientAngle: 45,
     blurAmount: 40,
-    stripeWidth: 24,
   };
 }
 

@@ -62,36 +62,6 @@ export function BorderControls({ photo }: { photo: PhotoConfig }) {
         </Field>
       ) : null}
 
-      {b.type === 'stripes' ? (
-        <>
-          <Field label="Color A">
-            <input
-              type="color"
-              value={b.color}
-              onChange={(e) => updateBorder(photo.id, { color: e.target.value })}
-              className="h-9 w-full cursor-pointer rounded border border-neutral-700 bg-transparent"
-            />
-          </Field>
-          <Field label="Color B">
-            <input
-              type="color"
-              value={b.color2}
-              onChange={(e) => updateBorder(photo.id, { color2: e.target.value })}
-              className="h-9 w-full cursor-pointer rounded border border-neutral-700 bg-transparent"
-            />
-          </Field>
-          <Field label={`Stripe width: ${b.stripeWidth}px`}>
-            <input
-              type="range"
-              min={6}
-              max={120}
-              value={b.stripeWidth}
-              onChange={(e) => updateBorder(photo.id, { stripeWidth: Number(e.target.value) })}
-              className="w-full"
-            />
-          </Field>
-        </>
-      ) : null}
     </div>
   );
 }

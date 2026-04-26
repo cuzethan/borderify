@@ -9,7 +9,6 @@ const BORDER_TYPES: { id: BorderType; label: string }[] = [
   { id: 'solid', label: 'Solid' },
   { id: 'blurred', label: 'Blurred' },
   { id: 'gradient', label: 'Gradient' },
-  { id: 'stripes', label: 'Stripes' },
 ];
 
 export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
