@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { CanvasPreset, PhotoConfig, BorderConfig } from './types';
 import { initialPhotoConfig, makeSplitPair } from './lib/autoLayout';
+import { clampTransform } from './lib/geometry';
 
 export interface SavedPhoto {
   id: string;
@@ -84,9 +85,50 @@ export const useStore = create<Store>((set, get) => ({
     })),
 
   updateTransform: (id, patch) =>
-    set((s) => ({
-      photos: s.photos.map((p) => (p.id === id ? { ...p, ...patch } : p)),
-    })),
+    set((s) => {
+      const target = s.photos.find((p) => p.id === id);
+      if (!target) return s;
+
+      let mirroredPatch: { offsetX?: number; offsetY?: number; scale?: number } | null = null;
+      let mirrorId: string | null = null;
+
+      if (target.splitOf) {
+        const otherHalf = target.splitOf.half === 'left' ? 'right' : 'left';
+        const sibling = s.photos.find(
+          (p) =>
+            p.id !== target.id &&
+            p.splitOf?.sourceId === target.splitOf?.sourceId &&
+            p.splitOf?.half === otherHalf,
+        );
+
+        if (sibling) {
+          const requestedScale = patch.scale ?? sibling.scale;
+          const requestedOffsetY = patch.offsetY ?? sibling.offsetY;
+          const requestedOffsetX =
+            patch.offsetX !== undefined ? -patch.offsetX : sibling.offsetX;
+          const clampedMirror = clampTransform(
+            sibling,
+            requestedOffsetX,
+            requestedOffsetY,
+            requestedScale,
+          );
+          mirrorId = sibling.id;
+          mirroredPatch = {
+            scale: clampedMirror.scale,
+            offsetY: clampedMirror.offsetY,
+            offsetX: clampedMirror.offsetX,
+          };
+        }
+      }
+
+      return {
+        photos: s.photos.map((p) => {
+          if (p.id === id) return { ...p, ...patch };
+          if (mirrorId && mirroredPatch && p.id === mirrorId) return { ...p, ...mirroredPatch };
+          return p;
+        }),
+      };
+    }),
 
   splitPhoto: (id) => {
     const photo = get().photos.find((p) => p.id === id);
@@ -113,6 +155,11 @@ export const useStore = create<Store>((set, get) => ({
         if (!response.ok) throw new Error(`Failed to fetch saved image: ${saved.imageUrl}`);
         const blob = await response.blob();
         const bitmap = await createImageBitmap(blob);
+        const splitHalf = saved.splitOf?.half;
+        const normalizedSplitOf =
+          saved.splitOf && (splitHalf === 'left' || splitHalf === 'right')
+            ? { sourceId: saved.splitOf.sourceId, half: splitHalf }
+            : undefined;
         return {
           id: saved.id,
           fileName: saved.fileName,
@@ -124,7 +171,7 @@ export const useStore = create<Store>((set, get) => ({
           offsetX: saved.offsetX,
           offsetY: saved.offsetY,
           scale: saved.scale,
-          splitOf: saved.splitOf ?? undefined,
+          splitOf: normalizedSplitOf,
         } satisfies PhotoConfig;
       }),
     );

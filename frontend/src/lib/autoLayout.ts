@@ -23,16 +23,15 @@ export function nextId(): string {
   return `p${Date.now().toString(36)}_${idCounter}`;
 }
 
-/** Decide whether this image should be split into left/right halves. */
-export function splitDirectionFor(photo: PhotoConfig): 'horizontal' | null {
+/** Whether this image should be split into left/right carousel halves. */
+export function canSplitForCarousel(photo: PhotoConfig): boolean {
   const imgRatio = photo.naturalW / photo.naturalH;
   // Landscape image in portrait/square canvas → split left/right (horizontal split of the image into 2 portrait halves)
-  if (imgRatio > 1.4 && photo.preset !== 'landscape') return 'horizontal';
-  return null;
+  return imgRatio > 1.4 && photo.preset !== 'landscape';
 }
 
 export function makeSplitPair(photo: PhotoConfig): [PhotoConfig, PhotoConfig] | null {
-  if (!splitDirectionFor(photo)) return null;
+  if (!canSplitForCarousel(photo)) return null;
   const base: Omit<PhotoConfig, 'id' | 'splitOf'> = {
     fileName: photo.fileName,
     bitmap: photo.bitmap,

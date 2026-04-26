@@ -1,7 +1,7 @@
 import type { PhotoConfig, BorderType, CanvasPreset } from '../types';
 import { useStore } from '../store';
 import { CANVAS_PRESETS, PRESET_ORDER } from '../lib/presets';
-import { splitDirectionFor } from '../lib/autoLayout';
+import { canSplitForCarousel } from '../lib/autoLayout';
 import { isCentered } from '../lib/geometry';
 import { BorderControls } from './BorderControls';
 
@@ -28,8 +28,7 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
     );
   }
 
-  const splitDir = splitDirectionFor(photo);
-  const canSplit = splitDir !== null && !photo.splitOf;
+  const canSplit = canSplitForCarousel(photo) && !photo.splitOf;
 
   return (
     <aside className="w-72 shrink-0 overflow-y-auto border-l border-neutral-800 bg-neutral-950 p-4">

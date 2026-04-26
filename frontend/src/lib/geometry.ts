@@ -33,6 +33,9 @@ export function sliceForHalf(srcW: number, srcH: number, half: SplitHalf): Sourc
       return { sx: 0, sy: 0, sw: srcW / 2, sh: srcH };
     case 'right':
       return { sx: srcW / 2, sy: 0, sw: srcW / 2, sh: srcH };
+    default:
+      // Defensive fallback: never return an invalid source rect.
+      return { sx: 0, sy: 0, sw: srcW, sh: srcH };
   }
 }
 
@@ -49,8 +52,14 @@ export function computeDestRect(config: PhotoConfig): DestRect {
   const fit = fitContain(src.sw, src.sh, cw, ch);
   const dw = fit.dw * config.scale;
   const dh = fit.dh * config.scale;
+  const anchoredDx = config.splitOf
+    ? config.splitOf.half === 'left'
+      ? cw - dw
+      : 0
+    : (cw - dw) / 2;
   return {
-    dx: (cw - dw) / 2 + config.offsetX,
+    // Split halves should hug the seam side, never re-center on the canvas x-axis.
+    dx: anchoredDx + config.offsetX,
     dy: (ch - dh) / 2 + config.offsetY,
     dw,
     dh,
@@ -68,9 +77,9 @@ export function isCentered(offsetX: number, offsetY: number): boolean {
 }
 
 /**
- * Clamp scale and offset so the image always stays fully within the canvas.
- * Max scale is determined by whichever canvas dimension the image fills first;
- * max offset shrinks as the image grows (less room to move when it's bigger).
+ * Clamp scale/offset bounds for editor interactions.
+ * Non-split images are kept fully within canvas bounds.
+ * Split images stay seam-anchored (no horizontal panning) and can scale larger.
  */
 export function clampTransform(
   photo: PhotoConfig,
@@ -82,13 +91,15 @@ export function clampTransform(
   const src = effectiveSource(photo);
   const fit = fitContain(src.sw, src.sh, cw, ch);
 
-  const maxScale = Math.min(cw / fit.dw, ch / fit.dh);
+  // Split halves stay seam-anchored, but should still be resizable.
+  // Non-split photos keep previous "fit-inside-canvas" max behavior.
+  const maxScale = photo.splitOf ? 5 : Math.min(cw / fit.dw, ch / fit.dh);
   const clampedScale = Math.max(0.05, Math.min(maxScale, scale));
 
   const dw = fit.dw * clampedScale;
   const dh = fit.dh * clampedScale;
-  const maxOffsetX = (cw - dw) / 2;
-  const maxOffsetY = (ch - dh) / 2;
+  const maxOffsetX = photo.splitOf ? 0 : Math.abs((cw - dw) / 2);
+  const maxOffsetY = Math.abs((ch - dh) / 2);
 
   return {
     scale: clampedScale,
