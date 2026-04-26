@@ -93,7 +93,7 @@ export function SignupPage() {
         </p>
 
         <div className="mt-6 text-center">
-          <Link to="/app" className="text-xs text-neutral-600 hover:text-neutral-400">
+          <Link to="/" className="text-xs text-neutral-600 hover:text-neutral-400">
             ← Back to editor
           </Link>
         </div>
