@@ -258,7 +258,7 @@ export function ExportBar() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center rounded-md px-2 py-1 transition-colors hover:bg-neutral-700/50"
+            className="flex items-center rounded-md px-2 py-1 transition-colors hover:bg-neutral-700/50 cursor-pointer"
           >
             <img src="/logo.png" alt="Borderify logo" style={{ width: 28, height: 28, marginRight: 10 }} />
             <span className="font-brand text-xl tracking-tight text-neutral-100">Borderify</span>

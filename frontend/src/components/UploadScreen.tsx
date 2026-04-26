@@ -86,8 +86,9 @@ export function UploadScreen() {
         <div className="w-full max-w-2xl flex justify-center">
           <button
             onClick={() => navigate('/')}
-            className="rounded-lg bg-neutral-800 px-6 py-3 text-sm font-normal text-white hover:bg-neutral-700"
+            className="rounded-lg bg-neutral-800 px-6 py-3 text-sm font-normal text-white hover:bg-neutral-700 cursor-pointer"
             aria-label="Return to homepage"
+
           >
             Return to Homepage
           </button>
