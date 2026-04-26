@@ -33,6 +33,7 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
   }
 
   const canSplit = canSplitForCarousel(photo) && !photo.splitOf;
+  const isSplitHalf = Boolean(photo.splitOf);
 
   return (
     <aside className="w-72 shrink-0 overflow-y-auto border-l border-neutral-800 bg-neutral-950 p-4">
@@ -109,13 +110,19 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
           Reset crop
         </button>
         {editorMode === 'crop' && (
-          <label className="mt-2 flex cursor-pointer items-center gap-2 text-xs text-neutral-300">
+          <label
+            className={[
+              'mt-2 flex items-center gap-2 text-xs',
+              isSplitHalf ? 'cursor-not-allowed text-neutral-500' : 'cursor-pointer text-neutral-300',
+            ].join(' ')}
+          >
             <div className="relative flex items-center justify-center">
               <input
                 type="checkbox"
                 checked={symmetricCrop}
                 onChange={toggleSymmetricCrop}
-                className="peer h-3.5 w-3.5 cursor-pointer appearance-none rounded-sm border border-neutral-600 bg-neutral-800 checked:border-emerald-500 checked:bg-emerald-500"
+                disabled={isSplitHalf}
+                className="peer h-3.5 w-3.5 appearance-none rounded-sm border border-neutral-600 bg-neutral-800 checked:border-emerald-500 checked:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
               />
               <svg
                 className="pointer-events-none absolute hidden h-3.5 w-3.5 text-black peer-checked:block"
@@ -128,6 +135,9 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
             Symmetric crop
           </label>
         )}
+        {editorMode === 'crop' && isSplitHalf ? (
+          <p className="mt-1 text-xs text-neutral-500">Disabled for split halves.</p>
+        ) : null}
       </Section>
 
       <Section title="Gridlines">

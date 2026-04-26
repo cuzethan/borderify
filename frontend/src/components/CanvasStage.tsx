@@ -196,6 +196,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
 
   const showSnapGuides = snapping && isVisiblyCentered(photo);
   const showGrid = !gridlinesHidden;
+  const isSymmetricCropEnabled = symmetricCrop && !photo.splitOf;
   const baseDest = computeBaseDestRect(photo);
   const crop = cropForFrame;
   const cropLeft = (baseDest.dx + baseDest.dw * crop.x) * displayScale;
@@ -261,7 +262,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
     const right = x + w;
     const bottom = y + h;
     if (state.handle.includes('w')) {
-      if (symmetricCrop) {
+      if (isSymmetricCropEnabled) {
         x = x + dx;
         w = w - 2 * dx;
       } else {
@@ -271,7 +272,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
       }
     }
     if (state.handle.includes('e')) {
-      if (symmetricCrop) {
+      if (isSymmetricCropEnabled) {
         x = x - dx;
         w = w + 2 * dx;
       } else {
@@ -279,7 +280,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
       }
     }
     if (state.handle.includes('n')) {
-      if (symmetricCrop) {
+      if (isSymmetricCropEnabled) {
         y = y + dy;
         h = h - 2 * dy;
       } else {
@@ -289,7 +290,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
       }
     }
     if (state.handle.includes('s')) {
-      if (symmetricCrop) {
+      if (isSymmetricCropEnabled) {
         y = y - dy;
         h = h + 2 * dy;
       } else {
