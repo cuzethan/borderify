@@ -2,6 +2,20 @@ import { create } from 'zustand';
 import type { CanvasPreset, PhotoConfig, BorderConfig } from './types';
 import { initialPhotoConfig, makeSplitPair } from './lib/autoLayout';
 
+export interface SavedPhoto {
+  id: string;
+  fileName: string;
+  naturalW: number;
+  naturalH: number;
+  preset: CanvasPreset;
+  border: BorderConfig;
+  offsetX: number;
+  offsetY: number;
+  scale: number;
+  splitOf?: { sourceId: string; half: 'left' | 'right' | 'top' | 'bottom' } | null;
+  imageUrl: string;
+}
+
 interface Store {
   photos: PhotoConfig[];
   selectedId: string | null;
@@ -19,6 +33,7 @@ interface Store {
   splitPhoto: (id: string) => void;
   toggleGridlines: () => void;
   clearAll: () => void;
+  loadSavedSession: (savedPhotos: SavedPhoto[]) => Promise<void>;
 }
 
 export const useStore = create<Store>((set, get) => ({
@@ -90,4 +105,33 @@ export const useStore = create<Store>((set, get) => ({
   toggleGridlines: () => set((s) => ({ gridlinesHidden: !s.gridlinesHidden })),
 
   clearAll: () => set({ photos: [], selectedId: null }),
+
+  loadSavedSession: async (savedPhotos) => {
+    const photos = await Promise.all(
+      savedPhotos.map(async (saved) => {
+        const response = await fetch(saved.imageUrl);
+        if (!response.ok) throw new Error(`Failed to fetch saved image: ${saved.imageUrl}`);
+        const blob = await response.blob();
+        const bitmap = await createImageBitmap(blob);
+        return {
+          id: saved.id,
+          fileName: saved.fileName,
+          bitmap,
+          naturalW: saved.naturalW,
+          naturalH: saved.naturalH,
+          preset: saved.preset,
+          border: saved.border,
+          offsetX: saved.offsetX,
+          offsetY: saved.offsetY,
+          scale: saved.scale,
+          splitOf: saved.splitOf ?? undefined,
+        } satisfies PhotoConfig;
+      }),
+    );
+
+    set({
+      photos,
+      selectedId: photos[0]?.id ?? null,
+    });
+  },
 }));

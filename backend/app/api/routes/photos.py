@@ -66,6 +66,42 @@ async def create_session(
     return {"ok": True, "session": inserted_row}
 
 
+@photos_router.get("/sessions/latest")
+async def get_latest_session(current_user: CurrentUser) -> dict[str, Any]:
+    if not settings.supabase_url or not settings.supabase_service_role_key:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Supabase DB is not configured",
+        )
+
+    rest_url = (
+        f"{settings.supabase_url.rstrip('/')}/rest/v1/session"
+        f"?user_id=eq.{current_user.user_id}&select=id,created_at,photos&order=created_at.desc&limit=1"
+    )
+    headers = {
+        "apikey": settings.supabase_service_role_key,
+        "Authorization": f"Bearer {settings.supabase_service_role_key}",
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.get(rest_url, headers=headers)
+            if response.status_code >= 400:
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail=f"Supabase fetch failed: {response.text}",
+                )
+            rows = response.json()
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Supabase fetch failed: {exc}",
+        ) from exc
+
+    latest = rows[0] if isinstance(rows, list) and rows else None
+    return {"ok": True, "session": latest}
+
+
 @photos_router.post("/upload", status_code=status.HTTP_201_CREATED)
 async def upload_photo(
     current_user: CurrentUser,
