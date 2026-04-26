@@ -282,14 +282,11 @@ export function LandingPage(): JSX.Element {
       <div style={{ background: "#111110", color: "#e8e6e2" }}>
         <nav>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/logo.png" alt="Borderify logo" className="logo-img" />
-            <span className="logo">Borderify</span>
-          </div>
-          <div className="nav-right">
-            <a href="#how" className="nav-link">
-              How it works
-            </a>
-          </div>
+                <img src="/logo.png" alt="Borderify logo" className="logo-img" style={{ marginRight: 8, width: 24, height: 24 }} />
+                <span style={{ fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1 }}>
+                  Borderify
+                </span>
+              </div>
         </nav>
 
         <div className="hero">

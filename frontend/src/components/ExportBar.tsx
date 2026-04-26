@@ -65,12 +65,21 @@ export function ExportBar() {
 
   return (
     <header className="flex items-center justify-between border-b border-neutral-800 bg-neutral-950 px-4 py-3">
-      <div className="flex items-baseline gap-3">
-        <h1 className="text-lg font-bold tracking-tight">Borderify</h1>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="flex items-center rounded-md px-2 py-1 hover:bg-neutral-700/40 focus:outline-none"
+          aria-label="Return to homepage"
+        >
+          <img src="/logo.png" alt="Borderify logo" style={{ width: 28, height: 28, marginRight: 10 }} />
+          <span className="text-lg font-bold tracking-tight text-neutral-100">Borderify</span>
+        </button>
         <span className="text-xs text-neutral-500">
           {photos.length} photo{photos.length === 1 ? '' : 's'}
         </span>
       </div>
+
       <div className="flex items-center gap-2">
         <button
           onClick={() => inputRef.current?.click()}
@@ -78,14 +87,16 @@ export function ExportBar() {
         >
           + Add photos
         </button>
+
         <button
           onClick={() => {
             if (confirm('Clear all photos?')) clearAll();
           }}
-          className="rounded-md border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
+          className="rounded-md bg-red-500 px-4 py-1.5 text-sm font-semibold text-black hover:bg-red-400"
         >
           Clear all
         </button>
+
         {isLoggedIn && (
           <button
             onClick={() => {}}
@@ -94,6 +105,7 @@ export function ExportBar() {
             Save
           </button>
         )}
+
         <button
           onClick={onExport}
           disabled={busy || photos.length === 0}
@@ -101,6 +113,7 @@ export function ExportBar() {
         >
           {busy ? 'Exporting…' : 'Download all (.zip)'}
         </button>
+
         {isLoggedIn && (
           <button
             onClick={onLogout}
@@ -109,6 +122,7 @@ export function ExportBar() {
             Log out
           </button>
         )}
+
         <input
           ref={inputRef}
           type="file"
