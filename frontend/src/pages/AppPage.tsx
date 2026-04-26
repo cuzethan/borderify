@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+// ...existing code...
 import { EditorScreen } from "../components/EditorScreen";
 import { UploadScreen } from "../components/UploadScreen";
 import { useStore } from "../store";
