@@ -16,6 +16,9 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
   const applyPresetToAll = useStore((s) => s.applyPresetToAll);
   const updateBorder = useStore((s) => s.updateBorder);
   const splitPhoto = useStore((s) => s.splitPhoto);
+  const editorMode = useStore((s) => s.editorMode);
+  const setEditorMode = useStore((s) => s.setEditorMode);
+  const resetCrop = useStore((s) => s.resetCrop);
   const photoCount = useStore((s) => s.photos.length);
   const gridlinesHidden = useStore((s) => s.gridlinesHidden);
   const toggleGridlines = useStore((s) => s.toggleGridlines);
@@ -70,6 +73,40 @@ export function ControlsPanel({ photo }: { photo: PhotoConfig | null }) {
 
       <Section title="Border options">
         <BorderControls photo={photo} />
+      </Section>
+
+      <Section title="Edit mode">
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setEditorMode('move')}
+            className={[
+              'rounded-md border px-2 py-1.5 text-xs',
+              editorMode === 'move'
+                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300'
+                : 'border-neutral-700 hover:bg-neutral-800',
+            ].join(' ')}
+          >
+            Move
+          </button>
+          <button
+            onClick={() => setEditorMode('crop')}
+            className={[
+              'rounded-md border px-2 py-1.5 text-xs',
+              editorMode === 'crop'
+                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300'
+                : 'border-neutral-700 hover:bg-neutral-800',
+            ].join(' ')}
+          >
+            Crop
+          </button>
+        </div>
+        <button
+          onClick={() => resetCrop(photo.id)}
+          className="mt-2 w-full rounded-md border border-neutral-700 px-2 py-1.5 text-xs text-neutral-300 hover:bg-neutral-800"
+          title="Reset crop to full image"
+        >
+          Reset crop
+        </button>
       </Section>
 
       {isCentered(photo.offsetX, photo.offsetY) ? (

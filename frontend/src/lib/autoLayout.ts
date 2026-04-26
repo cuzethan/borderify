@@ -42,6 +42,7 @@ export function makeSplitPair(photo: PhotoConfig): [PhotoConfig, PhotoConfig] | 
     offsetX: 0,
     offsetY: 0,
     scale: 1,
+    crop: { x: 0, y: 0, w: 1, h: 1 },
   };
   return [
     { ...base, id: nextId(), splitOf: { sourceId: photo.id, half: 'left' } },
@@ -62,6 +63,7 @@ export async function initialPhotoConfig(file: File): Promise<PhotoConfig> {
     offsetX: 0,
     offsetY: 0,
     scale: 1,
+    crop: { x: 0, y: 0, w: 1, h: 1 },
     splitOf: undefined,
   };
 }

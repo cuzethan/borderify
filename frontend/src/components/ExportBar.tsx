@@ -210,6 +210,7 @@ export function ExportBar() {
           offsetX: photo.offsetX,
           offsetY: photo.offsetY,
           scale: photo.scale,
+          crop: photo.crop,
           splitOf: photo.splitOf ?? null,
           imageUrl: uploaded.imageUrl,
           cloudinaryPublicId: uploaded.cloudinaryPublicId,

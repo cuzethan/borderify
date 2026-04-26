@@ -3,7 +3,15 @@ import type { PhotoConfig } from '../types';
 import { useStore } from '../store';
 import { renderPhotoToCanvas } from '../lib/render';
 import { CANVAS_PRESETS } from '../lib/presets';
-import { clampTransform, computeDestRect, isCentered, snapToCenter, SNAP_THRESHOLD } from '../lib/geometry';
+import {
+  clampTransform,
+  computeBaseDestRect,
+  computeDestRect,
+  isVisiblyCentered,
+  normalizeCrop,
+  snapTransformToVisibleCenter,
+  SNAP_THRESHOLD,
+} from '../lib/geometry';
 
 type HandleId = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w';
 
@@ -20,6 +28,8 @@ const HANDLES: { id: HandleId; cursor: string; xFrac: number; yFrac: number }[] 
 
 export function CanvasStage({ photo }: { photo: PhotoConfig }) {
   const updateTransform = useStore((s) => s.updateTransform);
+  const updateCrop = useStore((s) => s.updateCrop);
+  const editorMode = useStore((s) => s.editorMode);
   const gridlinesHidden = useStore((s) => s.gridlinesHidden);
   const ref = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,6 +43,20 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
     centerScreenX: number;
     centerScreenY: number;
   } | null>(null);
+  const cropMoveRef = useRef<{
+    startX: number;
+    startY: number;
+    crop: { x: number; y: number; w: number; h: number };
+    baseW: number;
+    baseH: number;
+  } | null>(null);
+  const cropResizeRef = useRef<{
+    handle: HandleId;
+    startX: number;
+    startY: number;
+    cropRectPx: { x: number; y: number; w: number; h: number };
+    baseRect: { x: number; y: number; w: number; h: number };
+  } | null>(null);
 
   // Render the canvas whenever photo state changes
   useEffect(() => {
@@ -40,8 +64,8 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
     if (!c) return;
     const ctx = c.getContext('2d');
     if (!ctx) return;
-    renderPhotoToCanvas(photo, ctx, c);
-  }, [photo]);
+    renderPhotoToCanvas(photo, ctx, c, { showCropUnderlay: editorMode === 'crop' });
+  }, [photo, editorMode]);
 
   const { w: cw, h: ch } = CANVAS_PRESETS[photo.preset];
 
@@ -65,6 +89,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
 
   // Drag-to-pan ----------------------------------------------------------
   function onPointerDown(e: PointerEvent<HTMLCanvasElement>) {
+    if (editorMode !== 'move') return;
     (e.target as Element).setPointerCapture(e.pointerId);
     dragRef.current = {
       startX: e.clientX,
@@ -75,26 +100,28 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
   }
 
   function onPointerMove(e: PointerEvent<HTMLCanvasElement>) {
+    if (editorMode !== 'move') return;
     const drag = dragRef.current;
     if (!drag) return;
     const dx = (e.clientX - drag.startX) / displayScale;
     const dy = (e.clientY - drag.startY) / displayScale;
     const rawX = drag.baseX + dx;
     const rawY = drag.baseY + dy;
-    const snappedX = snapToCenter(rawX);
-    const snappedY = snapToCenter(rawY);
-    const clamped = clampTransform(photo, snappedX, snappedY, photo.scale);
-    setSnapping(clamped.offsetX === 0 || clamped.offsetY === 0);
+    const snapped = snapTransformToVisibleCenter(photo, rawX, rawY);
+    const clamped = clampTransform(photo, snapped.offsetX, snapped.offsetY, photo.scale);
+    setSnapping(snapped.snappedX || snapped.snappedY);
     updateTransform(photo.id, { offsetX: clamped.offsetX, offsetY: clamped.offsetY });
   }
 
   function onPointerUp(e: PointerEvent<HTMLCanvasElement>) {
+    if (editorMode !== 'move') return;
     (e.target as Element).releasePointerCapture(e.pointerId);
     dragRef.current = null;
     setSnapping(false);
   }
 
   function onWheel(e: WheelEvent<HTMLCanvasElement>) {
+    if (editorMode !== 'move') return;
     e.preventDefault();
     const factor = e.deltaY < 0 ? 1.05 : 0.95;
     const { scale, offsetX, offsetY } = clampTransform(photo, photo.offsetX, photo.offsetY, photo.scale * factor);
@@ -103,6 +130,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
 
   // Aspect-locked resize via handles ------------------------------------
   function onHandleDown(e: PointerEvent<HTMLDivElement>, handle: HandleId) {
+    if (editorMode !== 'move') return;
     e.stopPropagation();
     (e.target as Element).setPointerCapture(e.pointerId);
     const stageBox = containerRef.current?.getBoundingClientRect();
@@ -111,8 +139,13 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
     const dest = computeDestRect(photo);
     const canvasBox = ref.current?.getBoundingClientRect();
     if (!canvasBox) return;
-    const centerScreenX = canvasBox.left + (dest.dx + dest.dw / 2) * displayScale;
-    const centerScreenY = canvasBox.top + (dest.dy + dest.dh / 2) * displayScale;
+    const crop = normalizeCrop(photo.crop);
+    const visibleLeft = (dest.dx + dest.dw * crop.x) * displayScale;
+    const visibleTop = (dest.dy + dest.dh * crop.y) * displayScale;
+    const visibleW = dest.dw * crop.w * displayScale;
+    const visibleH = dest.dh * crop.h * displayScale;
+    const centerScreenX = canvasBox.left + visibleLeft + visibleW / 2;
+    const centerScreenY = canvasBox.top + visibleTop + visibleH / 2;
     resizeRef.current = {
       handle,
       startCursorX: e.clientX,
@@ -124,6 +157,7 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
   }
 
   function onHandleMove(e: PointerEvent<HTMLDivElement>) {
+    if (editorMode !== 'move') return;
     const r = resizeRef.current;
     if (!r) return;
     const startDx = r.startCursorX - r.centerScreenX;
@@ -145,18 +179,121 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
   }
 
   function onHandleUp(e: PointerEvent<HTMLDivElement>) {
+    if (editorMode !== 'move') return;
     (e.target as Element).releasePointerCapture(e.pointerId);
     resizeRef.current = null;
   }
 
   // Where to draw the handles (in screen pixels relative to the canvas wrapper)
   const dest = computeDestRect(photo);
-  const handleLeft = dest.dx * displayScale;
-  const handleTop = dest.dy * displayScale;
-  const handleW = dest.dw * displayScale;
-  const handleH = dest.dh * displayScale;
+  const cropForFrame = normalizeCrop(photo.crop);
+  const visibleLeft = (dest.dx + dest.dw * cropForFrame.x) * displayScale;
+  const visibleTop = (dest.dy + dest.dh * cropForFrame.y) * displayScale;
+  const visibleW = dest.dw * cropForFrame.w * displayScale;
+  const visibleH = dest.dh * cropForFrame.h * displayScale;
 
-  const showGuides = snapping || (isCentered(photo.offsetX, photo.offsetY) && !gridlinesHidden);
+  const showGuides = snapping || (isVisiblyCentered(photo) && !gridlinesHidden);
+  const baseDest = computeBaseDestRect(photo);
+  const crop = cropForFrame;
+  const cropLeft = (baseDest.dx + baseDest.dw * crop.x) * displayScale;
+  const cropTop = (baseDest.dy + baseDest.dh * crop.y) * displayScale;
+  const cropW = baseDest.dw * crop.w * displayScale;
+  const cropH = baseDest.dh * crop.h * displayScale;
+
+  function onCropMoveDown(e: PointerEvent<HTMLDivElement>) {
+    e.stopPropagation();
+    (e.target as Element).setPointerCapture(e.pointerId);
+    cropMoveRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      crop,
+      baseW: baseDest.dw,
+      baseH: baseDest.dh,
+    };
+  }
+
+  function onCropMove(e: PointerEvent<HTMLDivElement>) {
+    const drag = cropMoveRef.current;
+    if (!drag) return;
+    const dx = (e.clientX - drag.startX) / displayScale;
+    const dy = (e.clientY - drag.startY) / displayScale;
+    const next = normalizeCrop({
+      x: drag.crop.x + dx / drag.baseW,
+      y: drag.crop.y + dy / drag.baseH,
+      w: drag.crop.w,
+      h: drag.crop.h,
+    });
+    updateCrop(photo.id, next);
+  }
+
+  function onCropMoveUp(e: PointerEvent<HTMLDivElement>) {
+    (e.target as Element).releasePointerCapture(e.pointerId);
+    cropMoveRef.current = null;
+  }
+
+  function onCropHandleDown(e: PointerEvent<HTMLDivElement>, handle: HandleId) {
+    e.stopPropagation();
+    (e.target as Element).setPointerCapture(e.pointerId);
+    cropResizeRef.current = {
+      handle,
+      startX: e.clientX,
+      startY: e.clientY,
+      cropRectPx: { x: cropLeft, y: cropTop, w: cropW, h: cropH },
+      baseRect: {
+        x: baseDest.dx * displayScale,
+        y: baseDest.dy * displayScale,
+        w: baseDest.dw * displayScale,
+        h: baseDest.dh * displayScale,
+      },
+    };
+  }
+
+  function onCropHandleMove(e: PointerEvent<HTMLDivElement>) {
+    const state = cropResizeRef.current;
+    if (!state) return;
+    const minPx = 12;
+    const dx = e.clientX - state.startX;
+    const dy = e.clientY - state.startY;
+    let { x, y, w, h } = state.cropRectPx;
+    const right = x + w;
+    const bottom = y + h;
+    if (state.handle.includes('w')) {
+      const nextX = Math.min(right - minPx, x + dx);
+      x = nextX;
+      w = right - nextX;
+    }
+    if (state.handle.includes('e')) {
+      w = Math.max(minPx, w + dx);
+    }
+    if (state.handle.includes('n')) {
+      const nextY = Math.min(bottom - minPx, y + dy);
+      y = nextY;
+      h = bottom - nextY;
+    }
+    if (state.handle.includes('s')) {
+      h = Math.max(minPx, h + dy);
+    }
+    const bx = state.baseRect.x;
+    const by = state.baseRect.y;
+    const bw = state.baseRect.w;
+    const bh = state.baseRect.h;
+    const clampedX = Math.max(bx, Math.min(bx + bw - minPx, x));
+    const clampedY = Math.max(by, Math.min(by + bh - minPx, y));
+    const clampedW = Math.max(minPx, Math.min(bx + bw - clampedX, w));
+    const clampedH = Math.max(minPx, Math.min(by + bh - clampedY, h));
+    const next = normalizeCrop({
+      x: (clampedX - bx) / bw,
+      y: (clampedY - by) / bh,
+      w: clampedW / bw,
+      h: clampedH / bh,
+    });
+    updateCrop(photo.id, next);
+  }
+
+  function onCropHandleUp(e: PointerEvent<HTMLDivElement>) {
+    (e.target as Element).releasePointerCapture(e.pointerId);
+    cropResizeRef.current = null;
+  }
 
   return (
     <div ref={containerRef} className="relative flex h-full w-full items-center justify-center overflow-hidden">
@@ -171,33 +308,72 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
           onPointerUp={onPointerUp}
           onWheel={onWheel}
           style={{ width: cw * displayScale, height: ch * displayScale, touchAction: 'none' }}
-          className="block cursor-grab active:cursor-grabbing"
+          className={['block', editorMode === 'move' ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'].join(' ')}
         />
 
-        {/* Resize-handle frame around the image's destination rect */}
-        <div
-          className="pointer-events-none absolute border border-emerald-400/60"
-          style={{ left: handleLeft, top: handleTop, width: handleW, height: handleH }}
-        />
-        {HANDLES.map((h) => {
-          const x = handleLeft + handleW * h.xFrac;
-          const y = handleTop + handleH * h.yFrac;
-          return (
+        {editorMode === 'move' ? (
+          <>
             <div
-              key={h.id}
-              onPointerDown={(e) => onHandleDown(e, h.id)}
-              onPointerMove={onHandleMove}
-              onPointerUp={onHandleUp}
-              className="absolute h-3 w-3 rounded-sm border border-emerald-300 bg-emerald-400 shadow"
+              className="pointer-events-none absolute border border-emerald-400/60"
+              style={{ left: visibleLeft, top: visibleTop, width: visibleW, height: visibleH }}
+            />
+            {HANDLES.map((h) => {
+              const x = visibleLeft + visibleW * h.xFrac;
+              const y = visibleTop + visibleH * h.yFrac;
+              return (
+                <div
+                  key={h.id}
+                  onPointerDown={(e) => onHandleDown(e, h.id)}
+                  onPointerMove={onHandleMove}
+                  onPointerUp={onHandleUp}
+                  className="absolute h-3 w-3 rounded-sm border border-emerald-300 bg-emerald-400 shadow"
+                  style={{
+                    left: x - 6,
+                    top: y - 6,
+                    cursor: h.cursor,
+                    touchAction: 'none',
+                  }}
+                />
+              );
+            })}
+          </>
+        ) : (
+          <>
+            <div
+              onPointerDown={onCropMoveDown}
+              onPointerMove={onCropMove}
+              onPointerUp={onCropMoveUp}
+              className="absolute border border-sky-400/90 bg-sky-500/10"
               style={{
-                left: x - 6,
-                top: y - 6,
-                cursor: h.cursor,
+                left: cropLeft,
+                top: cropTop,
+                width: cropW,
+                height: cropH,
+                cursor: 'move',
                 touchAction: 'none',
               }}
             />
-          );
-        })}
+            {HANDLES.map((h) => {
+              const x = cropLeft + cropW * h.xFrac;
+              const y = cropTop + cropH * h.yFrac;
+              return (
+                <div
+                  key={h.id}
+                  onPointerDown={(e) => onCropHandleDown(e, h.id)}
+                  onPointerMove={onCropHandleMove}
+                  onPointerUp={onCropHandleUp}
+                  className="absolute h-3 w-3 rounded-sm border border-sky-300 bg-sky-400 shadow"
+                  style={{
+                    left: x - 6,
+                    top: y - 6,
+                    cursor: h.cursor,
+                    touchAction: 'none',
+                  }}
+                />
+              );
+            })}
+          </>
+        )}
 
         {/* Center gridlines: shown while snapping during drag, OR persistently when centered */}
         {showGuides ? (
@@ -209,7 +385,9 @@ export function CanvasStage({ photo }: { photo: PhotoConfig }) {
       </div>
 
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded bg-black/60 px-2 py-1 text-xs text-neutral-300">
-        {cw} × {ch} · drag to pan · drag handles to resize · scroll to zoom · snaps within {SNAP_THRESHOLD}px
+        {editorMode === 'move'
+          ? `${cw} × ${ch} · drag to pan · drag handles to resize · scroll to zoom · snaps within ${SNAP_THRESHOLD}px`
+          : `${cw} × ${ch} · drag crop box to move · drag handles to crop`}
       </div>
     </div>
   );

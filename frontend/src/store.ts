@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import type { CanvasPreset, PhotoConfig, BorderConfig } from './types';
+import type { CanvasPreset, CropRect, PhotoConfig, BorderConfig } from './types';
 import { initialPhotoConfig, makeSplitPair } from './lib/autoLayout';
-import { clampTransform } from './lib/geometry';
+import { clampTransform, FULL_CROP, normalizeCrop } from './lib/geometry';
 
 export interface SavedPhoto {
   id: string;
@@ -13,15 +13,19 @@ export interface SavedPhoto {
   offsetX: number;
   offsetY: number;
   scale: number;
+  crop?: CropRect;
   splitOf?: { sourceId: string; half: 'left' | 'right' } | null;
   imageUrl: string;
 }
+
+type EditorMode = 'move' | 'crop';
 
 interface Store {
   user: { email: string } | null;
   photos: PhotoConfig[];
   selectedId: string | null;
   gridlinesHidden: boolean;
+  editorMode: EditorMode;
 
   login: (email: string) => void;
   logout: () => void;
@@ -35,7 +39,10 @@ interface Store {
   applyPresetToAll: (preset: CanvasPreset) => void;
   updateBorder: (id: string, patch: Partial<BorderConfig>) => void;
   updateTransform: (id: string, patch: { offsetX?: number; offsetY?: number; scale?: number }) => void;
+  updateCrop: (id: string, crop: CropRect) => void;
+  resetCrop: (id: string) => void;
   splitPhoto: (id: string) => void;
+  setEditorMode: (mode: EditorMode) => void;
   toggleGridlines: () => void;
   clearAll: () => void;
   loadSavedSession: (savedPhotos: SavedPhoto[]) => Promise<void>;
@@ -46,6 +53,7 @@ export const useStore = create<Store>((set, get) => ({
   photos: [],
   selectedId: null,
   gridlinesHidden: false,
+  editorMode: 'move',
 
   login: (email) => set({ user: { email } }),
   logout: () => set({ user: null }),
@@ -138,6 +146,67 @@ export const useStore = create<Store>((set, get) => ({
       };
     }),
 
+  updateCrop: (id, crop) =>
+    set((s) => {
+      const target = s.photos.find((p) => p.id === id);
+      if (!target) return s;
+      const normalized = normalizeCrop(crop);
+
+      let mirrorId: string | null = null;
+      let mirroredCrop: CropRect | null = null;
+
+      if (target.splitOf) {
+        const otherHalf = target.splitOf.half === 'left' ? 'right' : 'left';
+        const sibling = s.photos.find(
+          (p) =>
+            p.id !== target.id &&
+            p.splitOf?.sourceId === target.splitOf?.sourceId &&
+            p.splitOf?.half === otherHalf,
+        );
+        if (sibling) {
+          mirrorId = sibling.id;
+          mirroredCrop = normalizeCrop({
+            x: 1 - (normalized.x + normalized.w),
+            y: normalized.y,
+            w: normalized.w,
+            h: normalized.h,
+          });
+        }
+      }
+
+      return {
+        photos: s.photos.map((p) => {
+          if (p.id === id) return { ...p, crop: normalized };
+          if (mirrorId && mirroredCrop && p.id === mirrorId) return { ...p, crop: mirroredCrop };
+          return p;
+        }),
+      };
+    }),
+
+  resetCrop: (id) =>
+    set((s) => {
+      const target = s.photos.find((p) => p.id === id);
+      if (!target) return s;
+      let mirrorId: string | null = null;
+      if (target.splitOf) {
+        const otherHalf = target.splitOf.half === 'left' ? 'right' : 'left';
+        const sibling = s.photos.find(
+          (p) =>
+            p.id !== target.id &&
+            p.splitOf?.sourceId === target.splitOf?.sourceId &&
+            p.splitOf?.half === otherHalf,
+        );
+        if (sibling) mirrorId = sibling.id;
+      }
+      return {
+        photos: s.photos.map((p) => {
+          if (p.id === id) return { ...p, crop: FULL_CROP };
+          if (mirrorId && p.id === mirrorId) return { ...p, crop: FULL_CROP };
+          return p;
+        }),
+      };
+    }),
+
   splitPhoto: (id) => {
     const photo = get().photos.find((p) => p.id === id);
     if (!photo) return;
@@ -151,6 +220,8 @@ export const useStore = create<Store>((set, get) => ({
       return { photos, selectedId: pair[0].id };
     });
   },
+
+  setEditorMode: (mode) => set({ editorMode: mode }),
 
   toggleGridlines: () => set((s) => ({ gridlinesHidden: !s.gridlinesHidden })),
 
@@ -179,6 +250,7 @@ export const useStore = create<Store>((set, get) => ({
           offsetX: saved.offsetX,
           offsetY: saved.offsetY,
           scale: saved.scale,
+          crop: normalizeCrop(saved.crop),
           splitOf: normalizedSplitOf,
         } satisfies PhotoConfig;
       }),

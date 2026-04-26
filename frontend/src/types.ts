@@ -12,6 +12,13 @@ export interface BorderConfig {
 
 export type SplitHalf = 'left' | 'right';
 
+export interface CropRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface PhotoConfig {
   id: string;
   fileName: string;
@@ -23,5 +30,6 @@ export interface PhotoConfig {
   offsetX: number;
   offsetY: number;
   scale: number;
+  crop: CropRect;
   splitOf?: { sourceId: string; half: SplitHalf };
 }
