@@ -9,17 +9,19 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
-  
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    setErrorMsg('');
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      console.error(error);
+      setErrorMsg('Invalid email or password.');
     } else {
       navigate('/app');
     }
@@ -29,7 +31,10 @@ export function LoginPage() {
     <div className="flex min-h-full items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">Borderify</h1>
+          <div className="flex items-center justify-center gap-2">
+            <img src="/logo.png" alt="Borderify logo" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+            <h1 className="text-3xl font-bold tracking-tight">Borderify</h1>
+          </div>
           <p className="mt-2 text-sm text-neutral-400">Sign in to your account</p>
         </div>
 
@@ -67,6 +72,10 @@ export function LoginPage() {
               Forgot password?
             </a>
           </div>
+
+          {errorMsg && (
+            <p className="text-sm text-red-500">{errorMsg}</p>
+          )}
 
           <button
             type="submit"

@@ -264,10 +264,13 @@ export function ExportBar() {
   return (
     <header className="flex items-center justify-between border-b border-neutral-800 bg-neutral-950 px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="flex items-center rounded-md px-2 py-1">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center rounded-md px-2 py-1 transition-colors hover:bg-neutral-700/50"
+          >
             <img src="/logo.png" alt="Borderify logo" style={{ width: 28, height: 28, marginRight: 10 }} />
             <span className="text-lg font-bold tracking-tight text-neutral-100">Borderify</span>
-          </div>
+          </button>
           <span className="text-xs text-neutral-500">
             {photos.length} photo{photos.length === 1 ? '' : 's'}
           </span>

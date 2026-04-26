@@ -215,7 +215,7 @@ export function LandingPage(): JSX.Element {
         .step:last-child { border-bottom: none; }
 
         .step-n {
-          font-size: 0.75rem;
+          font-size: 1.25rem;
           color: #444;
           padding-top: 2px;
         }
@@ -353,13 +353,13 @@ export function LandingPage(): JSX.Element {
       <div style={{ background: "#111110", color: "#e8e6e2" }}>
         <nav>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-                <img src="/logo.png" alt="Borderify logo" className="logo-img" style={{ marginRight: 8, width: 24, height: 24 }} />
-                <span style={{ fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1 }}>
+                <img src="/logo.png" alt="Borderify logo" className="logo-img" style={{ marginRight: 10, width: 36, height: 36 }} />
+                <span style={{ fontFamily: 'Inter, system-ui, sans-serif', fontWeight: 700, fontSize: '1.4rem', lineHeight: 1 }}>
                   Borderify
                 </span>
               </div>
           <div className="nav-right">
-            <a href="/login" className="btn">Log in</a>
+            <a href="/login" className="btn" style={{ backgroundColor: '#ffffff' }}>Log in</a>
             <a href="/signup" className="btn" style={{ backgroundColor: "#10B981", color: "black" }}>Sign up</a>
           </div>
         </nav>
