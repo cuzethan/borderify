@@ -182,14 +182,16 @@ export function clampTransform(
   const src = effectiveBaseSource(photo);
   const fit = fitContain(src.sw, src.sh, cw, ch);
 
-  // Split halves stay seam-anchored, but should still be resizable.
-  // Non-split photos keep previous "fit-inside-canvas" max behavior.
-  const maxScale = photo.splitOf ? 5 : Math.min(cw / fit.dw, ch / fit.dh);
+  const crop = normalizeCrop(photo.crop);
+  // Allow zooming cropped photos until the visible crop can fill the canvas.
+  // Without this, post-crop zoom is capped at the original full-image fit.
+  const cropMaxScale = Math.min(cw / (fit.dw * crop.w), ch / (fit.dh * crop.h));
+  // Split halves stay seam-anchored and can still scale beyond canvas fill.
+  const maxScale = photo.splitOf ? 5 : cropMaxScale;
   const clampedScale = Math.max(0.05, Math.min(maxScale, scale));
 
   const dw = fit.dw * clampedScale;
   const dh = fit.dh * clampedScale;
-  const crop = normalizeCrop(photo.crop);
   const anchoredDx = photo.splitOf
     ? photo.splitOf.half === 'left'
       ? cw - dw
