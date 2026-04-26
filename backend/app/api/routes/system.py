@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from app.core.auth import AuthUser, get_current_user
 
-system_router = APIRouter(prefix="/api", tags=["system"])
+system_router = APIRouter(prefix="", tags=["system"])
 
 
 @system_router.get("/health")

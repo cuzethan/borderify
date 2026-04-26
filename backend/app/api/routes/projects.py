@@ -8,7 +8,7 @@ from app.core.auth import AuthUser, get_current_user
 
 CurrentUser = Annotated[AuthUser, Depends(get_current_user)]
 
-projects_router = APIRouter(prefix="/api/projects", tags=["projects"])
+projects_router = APIRouter(prefix="/projects", tags=["projects"])
 
 
 @projects_router.get("")

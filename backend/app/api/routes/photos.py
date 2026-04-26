@@ -16,7 +16,7 @@ from app.core.config import settings
 
 CurrentUser = Annotated[AuthUser, Depends(get_current_user)]
 
-photos_router = APIRouter(prefix="/api/photos", tags=["photos"])
+photos_router = APIRouter(prefix="/photos", tags=["photos"])
 logger = logging.getLogger(__name__)
 
 
