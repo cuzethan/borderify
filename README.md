@@ -14,10 +14,6 @@ Common camera outputs like 3:2, 2:3, panoramic, and mixed-orientation sets don't
 
 ## Demo
 
-Add your own assets under `docs/` (folder optional until you add files):
-
-![Borderify demo](docs/demo.gif)
-
 | ![Editor screenshot](docs/editor.png) | ![Carousel split screenshot](docs/split.png) |
 | --- | --- |
 
@@ -64,12 +60,13 @@ Per-photo styling in [`borders.ts`](frontend/src/lib/borders.ts):
 ### Crop mode
 
 - **Non-destructive crop:** a movable, resizable crop window over the mapped image; **Reset crop** returns to full frame ([`CanvasStage.tsx`](frontend/src/components/CanvasStage.tsx), clip logic in [`render.ts`](frontend/src/lib/render.ts))
+- **Symmetric crop:** a checkbox in crop mode that mirrors the crop rectangle horizontally and vertically simultaneously, keeping the subject centered
 - For **split carousel halves**, cropping one half **mirrors** on the other so the seam stays coherent ([`store.ts`](frontend/src/store.ts) — `updateCrop` / `resetCrop`)
 
 ### Center snapping and gridlines
 
 - Panning **snaps** when within `SNAP_THRESHOLD` (60px) of true visual center ([`geometry.ts`](frontend/src/lib/geometry.ts))
-- When the image is visibly centered, **center gridlines** can be shown or hidden from the sidebar
+- **Gridlines** can be toggled on or off at any time from the sidebar via the **Show / Hide gridlines** button
 
 ### Carousel split
 
@@ -78,8 +75,9 @@ Per-photo styling in [`borders.ts`](frontend/src/lib/borders.ts):
 
 ### Photo list
 
-- **Drag-and-drop reorder** thumbnails
-- **Remove** individual photos; **Clear all**; **Add photos** from the editor header ([`PhotoList.tsx`](frontend/src/components/PhotoList.tsx), [`ExportBar.tsx`](frontend/src/components/ExportBar.tsx))
+- **Drag-and-drop reorder** thumbnails in the left sidebar
+- **Add photos** while editing by clicking the "Click to Add" button at the bottom of the photo list, or by dragging image files directly onto the sidebar panel ([`PhotoList.tsx`](frontend/src/components/PhotoList.tsx))
+- **Remove** individual photos with the × button on each thumbnail; **Clear all** from the editor header
 
 ### Optional cloud session save
 
@@ -305,3 +303,5 @@ curl http://localhost:8000/health
 - Brendan Ly
 - Ethan Le
 - Jason Nguyen
+
+Built at **SJHacks 2026**.

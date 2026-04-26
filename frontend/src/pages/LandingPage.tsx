@@ -647,7 +647,10 @@ export function LandingPage(): JSX.Element {
         </div>{/* sides-wrapper */}
 
         <footer>
-          <div style={{ width: 120 }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <img src="/sjhacks.svg" alt="SJHacks" style={{ width: 40, height: 40 }} />
+            <span style={{ fontSize: '1.2rem', fontWeight: 600, color: '#ffffff', letterSpacing: '0.02em' }}>SJHacks 2026</span>
+          </div>
 
           <div className="footer-center">
             <span className="footer-copy">Brendan Ly · Ethan Le · Jason Nguyen</span>
